@@ -18,8 +18,8 @@ class AppPermission(models.Model):
 
 class AndroidProject(models.Model):
     project_id = models.CharField(max_length=64, primary_key=True)
-    project_build_tool=  models.CharField(max_length=16, default="gradle")
-    project_desc = models.CharField(max_length=64,default=None,null=True)
+    project_build_tool=  models.CharField(max_length=16, default="gradle",blank=True)
+    project_desc = models.CharField(max_length=64,default="",blank=True)
 
 
 
@@ -29,7 +29,7 @@ class Application(models.Model):
     app_description = models.CharField(max_length=64,default=None,null=True)
     app_version= models.FloatField(default=1)
     app_flavor= models.CharField(max_length=32, default="")
-    app_build_type = models.CharField(max_length=16)
+    app_build_type = models.CharField(max_length=16,default="",blank=True)
     app_project = models.ForeignKey(AndroidProject, related_name='belongs_project', on_delete=models.CASCADE)
 
 class Class(models.Model):
@@ -42,7 +42,7 @@ class Class(models.Model):
     class_superclass = models.CharField(max_length=64, default=None,blank=True, null=True)
     class_is_interface = models.BooleanField(default=False)
     #class_n_vars = models.IntegerField()
-    class_implemented_ifaces = models.CharField(max_length=256,default=None,blank=True, null=True)
+    class_implemented_ifaces = models.CharField(max_length=256,default="",blank=True)
 
 class ImportClass(models.Model):
     class Meta:
@@ -61,8 +61,8 @@ class Method(models.Model):
     method_id = models.CharField(primary_key=True,max_length=384)
     method_name = models.CharField(max_length=256)
     #method_hash_args = models.CharField(max_length=34,default="")
-    method_non_acc_mod = models.CharField(max_length=32)
-    method_acc_modifier = models.CharField(max_length=16)
+    method_non_acc_mod = models.CharField(max_length=32,default="",blank=True)
+    method_acc_modifier = models.CharField(max_length=16,default="",blank=True)
     method_class = models.ForeignKey(Class, related_name='classofmethod', on_delete=models.CASCADE, null=True)
     #method_args = models.CharField(max_length=256, default = None, null=True)
 

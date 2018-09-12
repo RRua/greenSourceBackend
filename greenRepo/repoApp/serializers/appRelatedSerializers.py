@@ -5,15 +5,53 @@ from repoApp.models.metricsRelated import *
 from repoApp.serializers.metricRelatedSerializers import MethodMetricSerializer
 from django.utils import timezone
 
-class ApplicationSerializer(serializers.ModelSerializer):
+
+
+
+class AndroidProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
-        obj = Application.objects.create(**validated_data)
-        obj.app_build_tool= obj.app_build_tool.lower()
+        obj = AndroidProject.objects.create(**validated_data)
+        obj.project_build_tool = obj.project_build_tool.lower()
         obj.save()
         return obj
     class Meta:
+        model = AndroidProject
+        fields = ('project_id', 'project_build_tool', 'project_desc')
+        validators = []
+
+
+class AndroidProjectWithAppsSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super(AndroidProjectWithAppsSerializer, self).__init__(*args, **kwargs) 
+        self.fields['project_apps'] = serializers.SerializerMethodField()
+     
+    def get_project_apps(self, proj):
+        apps = Application.objects.filter(app_project=proj.project_id)
+        return ApplicationSerializer(instance=apps,  many=True).data  
+    class Meta:
+        model = AndroidProject
+        fields = ('project_id', 'project_build_tool', 'project_desc')
+        validators = []
+
+
+
+class ApplicationListSerializer(serializers.ListSerializer):
+    def create(self, validated_data):
+        methods = []
+        for item in validated_data:
+            try:
+                m = Application(**item)
+                m.save()
+     #meti agora
+            except Exception as e:
+                continue
+        return True
+
+class ApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
         model = Application
-        fields = ('app_id', 'app_location', 'app_description', 'app_language','app_build_tool','app_version','app_flavor','app_build_type')
+        list_serializer_class =ApplicationListSerializer
+        fields = ('app_id', 'app_location', 'app_description','app_version','app_flavor','app_build_type', 'app_project')
         validators = []
 
 
@@ -55,7 +93,7 @@ class ClassSerializer(serializers.ModelSerializer):
         list_serializer_class =ClassListSerializer
         fields = ('class_id', 'class_name', 'class_package', 'class_non_acc_mod',
             'class_app', 'class_acc_modifier', 'class_superclass', 'class_is_interface' ,'class_implemented_ifaces')
-        validators = []
+        validators=[]        
 
 #TODO classwithImportsSerializer
 
@@ -109,9 +147,11 @@ class MethodListSerializer(serializers.ListSerializer):
             try:
                 m = Method(**item)
                 m.save()
+     #meti agora
             except Exception as e:
                 continue
         return True
+        #return Method.objects.bulk_create(methods)
 
 
 class MethodWithMetricsSerializer(serializers.ModelSerializer):

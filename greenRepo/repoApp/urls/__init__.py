@@ -1,6 +1,8 @@
 from django.urls import path, include
 from repoApp.views.populate import PopulateView, PopulateDummyTest
+
 urlpatterns = [
+	path('projects/', include('repoApp.urls.projects')),
     path('results/', include('repoApp.urls.results')),
     path('tests/', include('repoApp.urls.tests')),
     path('devices/', include('repoApp.urls.devices')),

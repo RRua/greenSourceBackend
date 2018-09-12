@@ -14,14 +14,34 @@ class PopulateDummyTest(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         try:
+            a = AndroidProject()
+            a.project_id="xxxx-dummy-xxxx-project-test"
+            a.project_desc="dumb"
+            a.project_build_tool="gradle"
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
             a = Application()
             a.app_id="dummy_app"
             a.app_location="/Users/dummyUser/apps/dummyApp"
             a.app_description="dumb"
             a.app_language="java"
-            a.app_build_tool="gradle"
             a.app_version=1.1
             a.app_flavor="demo"
+            a.app_project=AndroidProject.objects.get(project_id="xxxx-dummy-xxxx-project-test")
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Application()
+            a.app_id="dummy_app2"
+            a.app_location="/Users/dummyUser/apps/dummyApp2"
+            a.app_description="dumb"
+            a.app_language="java"
+            a.app_version=1.1
+            a.app_flavor="demo"
+            a.app_project=AndroidProject.objects.get(project_id="xxxx-dummy-xxxx-project-test")
             a.save()
         except Exception as e:
             print(e)

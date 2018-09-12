@@ -16,40 +16,88 @@ from repoApp.serializers.appRelatedSerializers import *
 from repoApp.serializers.metricRelatedSerializers import *
 
 
+
+class ProjectView(APIView):
+    def get(self, request,projid):
+        query=parse_qs(request.META['QUERY_STRING'])
+        results = AndroidProject.objects.get(project_id=projid)
+        serialize = AndroidProjectWithAppsSerializer(results, many=False)
+        return Response(serialize.data, HTTP_200_OK)
+
+    def put(self, request,projid):
+        return Response('Not implemented ', HTTP_404_NOT_FOUND)
+
+
+class ProjectListView(APIView):
+    def get(self, request):
+        query=parse_qs(request.META['QUERY_STRING'])
+        results = AndroidProject.objects.all()
+        if 'project_id' in query:
+            results=results.filter(project_id=query['project_id'][0])
+        if 'project_build_tool' in query:
+            results=results.filter(project_build_tool=query['project_build_tool'][0])
+        serialize = AndroidProjectSerializer(results, many=True)
+        return Response(serialize.data, HTTP_200_OK)
+
+    def post(self, request):
+        data = JSONParser().parse(request) 
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = AndroidProjectSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=True):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = AndroidProjectSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=True):
+                instance.save()
+                Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
+
+
 class AppsListView(APIView):
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Application.objects.all()
-        if 'id' in query:
-            results=results.filter(app_id=query['id'][0])
-        if 'language' in query:
-            results=results.filter(app_language=query['language'][0])
-        if 'build_tool' in query:
-            results=results.filter(app_build_tool=query['build_tool'][0])
-        if 'version' in query:
-            results=results.filter(app_version=query['version'][0])
-        if 'flavor' in query:
-            results=results.filter(app_flavor=query['flavor'][0])
+        if 'app_id' in query:
+            results=results.filter(app_id=query['app_id'][0])
+        if 'app_description' in query:
+            results=results.filter(app_description__contains=query['app_description'][0])
+        if 'app_version' in query:
+            results=results.filter(app_version=query['app_version'][0])
+        if 'app_flavor' in query:
+            results=results.filter(app_flavor=query['app_flavor'][0])
+        if 'app_project' in query:
+            try:
+                proj = AndroidProject.objects.get(project_id=query['app_project'][0])
+                results=results.filter(app_project=proj)
+            except Exception as e:
+                return Response(status=HTTP_404_NOT_FOUND)
         serialize = ApplicationSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-
+    #adiciona apps mesmo tendo no meio apps que ja existam
     def post(self, request):
-        data = JSONParser().parse(request)
-        try: 
-            serializer = ApplicationSerializer(data=data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-    
-                instance = serializer.create(serializer.validated_data)
-                instance.save()
-                serialize = ApplicationSerializer(instance, many=False)
-                return Response(serialize.data, HTTP_200_OK)
-        except Exception as ex:
-            print(ex)
-            return Response(serializer.data, HTTP_200_OK)
+        data = JSONParser().parse(request) 
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = ApplicationSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=True):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
         else:
-            return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
-        
+            instance = ApplicationSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=True):
+                instance.save()
+                Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
+            
 
 class AppsDetailView(APIView):
     def get(self, request,appid):
@@ -57,7 +105,7 @@ class AppsDetailView(APIView):
         try:
             results = Application.objects.get(app_id=appid)
         except ObjectDoesNotExist:
-             return Response("Application not present in database", HTTP_400_BAD_REQUEST)  
+             return Response(status=HTTP_404_NOT_FOUND)  
         serialize = ApplicationSerializer(results, many=False)
         return Response(serialize.data, HTTP_200_OK)
 
@@ -96,46 +144,40 @@ class AppsClassListView(APIView):
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Class.objects.filter(class_app=appid)
-        if 'package' in query:
-            results=results.filter(class_package=query['package'][0].lower())
-        if 'name' in query:
-            results=results.filter(class_name=query['name'][0].lower())
+        if 'class_is_interface' in query:
+            results=results.filter(class_package=query['class_is_interface'][0])
+        if 'class_id' in query:
+            results=results.filter(class_id=query['class_id'][0])
+        if 'class_package' in query:
+            results=results.filter(class_package=query['class_package'][0])
+        if 'class_name' in query:
+            results=results.filter(class_name=query['class_name'][0])
         if 'class_non_acc_mod' in query:
-            results=results.filter(class_class_non_acc_mod=query['class_non_acc_mod'][0])
-        if 'superclass' in query:
-            results=results.filter(class_superclass=query['superclass'][0])
+            results=results.filter(class_non_acc_mod__contains=query['class_non_acc_mod'][0])
+        if 'class_implemented_ifaces' in query:
+            results=results.filter(class_non_acc_mod__contains=query['class_implemented_ifaces'][0])
+        if 'class_superclass' in query:
+            results=results.filter(class_superclass=query['class_superclass'][0])
         serialize = ClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
     def post(self, request,appid):
         data = JSONParser().parse(request)
-        serializer = ClassSerializer(data=data, many=isinstance(data,list), partial=True)
-        try:
-            if serializer.is_valid(raise_exception=True):
-                if isinstance(data,list):
-                    for item in data:
-                        try:
-                            print("ulha")
-                            print(item)
-                            instance = ClassSerializer(data=item, many=False, partial=True)
-                            if instance.is_valid(raise_exception=True):
-                                instance.save()
-                            #serializer = TestSerializer(instance, many=isinstance(data,list))
-                        except Exception as e:
-                            print(e)
-                            continue
-                    return Response(serializer.data, HTTP_200_OK)
-                else:
-                    try:
-                        instance = serializer.create(serializer.validated_data)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = ClassSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=True):
                         instance.save()
-                        print("seixo")
-                    except Exception as e:
-                         Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
-            return Response(serializer.data, HTTP_200_OK)
-        except Exception as e:
-            print(e)
-            return Response(serializer.data, HTTP_200_OK)
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = ClassSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=True):
+                instance.save()
+                Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
 class ResultsTestListView(APIView):
@@ -172,6 +214,8 @@ class AppsMethodsDetailView(APIView):
         classes = Class.objects.filter(class_app=appid)
         results = Method.objects.filter(method_class__in=classes.values('class_id'))
         results = results.filter(method_name=methodid)
+        if 'method_id' in query:
+            results=results.filter(method_id=query['method_id'][0])
         serialize = MethodWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
@@ -272,15 +316,7 @@ class MethodInvokedListView(APIView):
         data = JSONParser().parse(request)
         serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
         if serializer.is_valid(raise_exception=True):
-            if isinstance(data,list):
-                for item in data:
-                    try:
-                        instance = MethodInvokedSerializer(data=item, many=False, partial=True)
-                        if instance.is_valid(raise_exception=True):
-                            instance.save()
-                        #serializer = TestSerializer(instance, many=isinstance(data,list))
-                    except IntegrityError as e:
-                        continue
+            
             return Response(serializer.data, HTTP_200_OK)
         else:
             return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
