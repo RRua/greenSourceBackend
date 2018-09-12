@@ -8,6 +8,7 @@ urlpatterns = [
     path('devices/', include('repoApp.urls.devices')),
     path('apps/', include('repoApp.urls.apps')),
     path('methods/', include('repoApp.urls.methods')),
+    path('classes/', include('repoApp.urls.classes')),
     path('populate/', PopulateView.as_view(), name='populate'),
     path('populateTest/', PopulateDummyTest.as_view(), name='pop'),
 ]

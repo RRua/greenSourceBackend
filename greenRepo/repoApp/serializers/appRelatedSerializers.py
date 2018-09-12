@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from repoApp.models.appRelated import *
 from repoApp.models.metricsRelated import *
-from repoApp.serializers.metricRelatedSerializers import MethodMetricSerializer
+from repoApp.serializers.metricRelatedSerializers import MethodMetricSerializer, ClassMetricSerializer
 from django.utils import timezone
 
 
@@ -96,6 +96,23 @@ class ClassSerializer(serializers.ModelSerializer):
         validators=[]        
 
 #TODO classwithImportsSerializer
+
+
+class ClassWithMetricsSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super(ClassWithMetricsSerializer, self).__init__(*args, **kwargs) 
+        self.fields['class_metrics'] = serializers.SerializerMethodField()
+     
+    def get_class_metrics(self, classe):
+        met = ClassMetric.objects.filter(cm_class=classe.class_id)
+        return ClassMetricSerializer(instance=met,  many=True).data  
+
+    class Meta:
+        model = Class
+        list_serializer_class =ClassListSerializer
+        fields = ('class_id', 'class_name', 'class_package', 'class_non_acc_mod',
+            'class_app', 'class_acc_modifier', 'class_superclass', 'class_is_interface' ,'class_implemented_ifaces')
+        validators = []
 
 class ClassWithImportsSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):

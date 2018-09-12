@@ -309,6 +309,59 @@ class MethodMetricsView(APIView):
                 return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_400_BAD_REQUEST)
 
+class ClassMetricsView(APIView):
+    def get(self, request):
+        query=parse_qs(request.META['QUERY_STRING'])
+        results = Class.objects.all()
+        metrics=ClassMetric.objects.all()
+        if 'class_name' in query:
+            results=results.filter(class_name=query['class_name'][0])
+        if 'class_metric' in query:
+            try:
+                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_metric=query['method_metric'][0])
+                results=results.filter(class_id__in=metrics.values('cm_class'))
+            except ObjectDoesNotExist:
+                pass
+        if 'class_metric_value' in query:
+            try:
+                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_value=query['method_metric_value'][0])
+                results=results.filter(class_id__in=metrics.values('cm_class'))
+            except ObjectDoesNotExist:
+                pass 
+        if 'class_metric_value_gte' in query:
+            try:
+                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_value__gte=query['method_metric_value_gte'][0])
+                results=results.filter(class_id__in=metrics.values('cm_class'))
+            except ObjectDoesNotExist:
+                pass
+        serialize = MethodSerializer(results, many=True)
+        if 'class_metric_value_lte' in query:
+            try:
+                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_value__lte=query['method_metric_value_lte'][0])
+                results=results.filter(class_id__in=metrics.values('cm_class'))
+            except ObjectDoesNotExist:
+                pass  
+        serialize = ClassWithMetricsSerializer(results, many=True)
+        return Response(serialize.data, HTTP_200_OK)
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = ClassithMetricsSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=False):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = ClassWithMetricsSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=False):
+                instance.save()
+                return Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
+
 
 class MethodInvokedListView(APIView):
     def post(self, request):
@@ -336,6 +389,45 @@ class MethodInvokedListView(APIView):
                 print(e)
                 return Response(instance.data, HTTP_400_BAD_REQUEST)
 
+
+class ClassesListView(APIView):
+    def get(self, request):
+        query=parse_qs(request.META['QUERY_STRING'])
+        results = Class.objects.all()
+        if 'class_is_interface' in query:
+            results=results.filter(class_package=query['class_is_interface'][0])
+        if 'class_id' in query:
+            results=results.filter(class_id=query['class_id'][0])
+        if 'class_package' in query:
+            results=results.filter(class_package=query['class_package'][0])
+        if 'class_name' in query:
+            results=results.filter(class_name=query['class_name'][0])
+        if 'class_non_acc_mod' in query:
+            results=results.filter(class_non_acc_mod__contains=query['class_non_acc_mod'][0])
+        if 'class_implemented_ifaces' in query:
+            results=results.filter(class_non_acc_mod__contains=query['class_implemented_ifaces'][0])
+        if 'class_superclass' in query:
+            results=results.filter(class_superclass=query['class_superclass'][0])
+        serialize = ClassSerializer(results, many=True)
+        return Response(serialize.data, HTTP_200_OK)
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = ClassSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=True):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = ClassSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=True):
+                instance.save()
+                return Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
 

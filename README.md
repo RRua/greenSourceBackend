@@ -21,6 +21,10 @@
 ####python manage.py runserver
 
 
+## NOTES
+### Metrics coeficient refers the factor relative to the IS (International System) units ( 1 second -> coeficient 1, 13 ms -> coeficient = 0.001)
+
+
 ```
 ## API
 
@@ -49,6 +53,10 @@
 - Class
   - [GET /apps/<app_id>/classes/](#get-class)
   - [POST /apps/<app_id>/classes/](#post-class)
+  - [GET /classes/](#get-classes)
+  - [POST /classes/](#post-classes)
+  - [GET /classes/metrics/](#class-metrics)
+  - [POST /classes/metrics/](#class-metrics)
 
 - Method
   - [GET /apps/<app_id>/methods/](#app-methods)
@@ -57,7 +65,6 @@
   - [POST /methods/](#methods)
   - [GET /methods/metrics/](#methods-metrics)
   - [POST /methods/metrics/](#methods-metrics)
-  - [POST /methods/invoked/](#methods-invoked)
 
 - Test 
   - [GET /tests/](#app-tests)
@@ -431,6 +438,163 @@ Povoa a BD com dados dummy para fins de testing.
     }
 ]
 ```
+
+## GET /classes/
+- *class_package*: filter by  ``class_package``
+- *class_name*: filter by   ``class_name``
+- *class_non_acc_mod*: filter by  ``class_non_acc_mod``
+- *class_id*: filter by   ``class_id``
+- *class_is_interface*: filter by   ``class_is_interface``
+- *class_implemented_ifaces*:(interface implemented )filter by   ``class_implemented_ifaces``
+- *class_superclass*: filter by   ``class_superclass``
+
+
+#### Response (CODE HTTP200)
+```json
+[
+   {
+        "class_id": "com.dummy.dummyapp.DummyActivity",
+        "class_name": "DummyActivity",
+        "class_package": "com.dummy.dummyapp",
+        "class_non_acc_mod": "",
+        "class_app": "dummy_app",
+        "class_acc_modifier": "public",
+        "class_superclass": "Activity",
+        "class_is_interface": false,
+        "class_implemented_ifaces": null
+    }
+]
+```
+
+### POST /classes/
+#### Body
+```json
+[
+   {
+        "class_id": "com.dummy.dummyapp.DummyActivity",
+        "class_name": "DummyActivity",
+        "class_package": "com.dummy.dummyapp",
+        "class_non_acc_mod": "",
+        "class_app": "dummy_app",
+        "class_acc_modifier": "public",
+        "class_superclass": "Activity",
+        "class_is_interface": false,
+        "class_implemented_ifaces": null
+    }
+]
+```
+
+#### Expected Response (CODE HTTP200)
+```json
+[
+    {
+        "class_id": "com.dummy.dummyapp.DummyActivity",
+        "class_name": "DummyActivity",
+        "class_package": "com.dummy.dummyapp",
+        "class_non_acc_mod": "",
+        "class_app": "dummy_app",
+        "class_acc_modifier": "public",
+        "class_superclass": "Activity",
+        "class_is_interface": false,
+        "class_implemented_ifaces": null
+    }
+]
+```
+
+
+
+## GET /classes/metrics/
+- *class_name*: filter by  ``class_name`` 
+- *class_metric*: filter by  ``class_metric`` 
+- *class_metric_value*: filter by   ``class_metric_value``
+- *class_metric_value_gte*: filter by  ``class_metric_value >= value`` 
+- *class_metric_value_lte*: filter by   ``class_metric_value <= value``
+
+
+#### Response (CODE HTTP200)
+```json
+[
+     {
+        "class_id": "com.dummy.dummyapp.DummyActivity",
+        "class_name": "DummyActivity",
+        "class_package": "com.dummy.dummyapp",
+        "class_non_acc_mod": "",
+        "class_app": "dummy_app",
+        "class_acc_modifier": "public",
+        "class_superclass": "Activity",
+        "class_is_interface": false,
+        "class_implemented_ifaces": null,
+        "class_metrics": [
+            {
+                "cm_class": "com.dummy.dummyapp.DummyActivity",
+                "cm_timestamp": "2018-09-11T13:46:59.129746Z",
+                "cm_metric": "totalenergy",
+                "cm_value": 13,
+                "cm_coeficient": 1,
+                "cm_value_text": "totalmethods"
+            }
+        ]
+    }
+]
+```
+
+### POST /classes/metrics/
+#### Body
+```json
+[
+    {
+        "class_id": "com.dummy.dummyapp.DummyActivity",
+        "class_name": "DummyActivity",
+        "class_package": "com.dummy.dummyapp",
+        "class_non_acc_mod": "",
+        "class_app": "dummy_app",
+        "class_acc_modifier": "public",
+        "class_superclass": "Activity",
+        "class_is_interface": false,
+        "class_implemented_ifaces": null,
+        "class_metrics": [
+            {
+                "cm_class": "com.dummy.dummyapp.DummyActivity",
+                "cm_timestamp": "2018-09-11T13:46:59.129746Z",
+                "cm_metric": "totalenergy",
+                "cm_value": 13,
+                "cm_coeficient": 1,
+                "cm_value_text": "totalmethods"
+            }
+        ]
+    }
+]
+```
+
+#### Expected Response (CODE HTTP200)
+```json
+[
+    {
+        "class_id": "com.dummy.dummyapp.DummyActivity",
+        "class_name": "DummyActivity",
+        "class_package": "com.dummy.dummyapp",
+        "class_non_acc_mod": "",
+        "class_app": "dummy_app",
+        "class_acc_modifier": "public",
+        "class_superclass": "Activity",
+        "class_is_interface": false,
+        "class_implemented_ifaces": null,
+        "class_metrics": [
+            {
+                "cm_class": "com.dummy.dummyapp.DummyActivity",
+                "cm_timestamp": "2018-09-11T13:46:59.129746Z",
+                "cm_metric": "totalenergy",
+                "cm_value": 13,
+                "cm_coeficient": 1,
+                "cm_value_text": "totalmethods"
+            }
+        ]
+    }
+]
+```
+
+
+
 
 ## GET /devices/
 - *device_serial_number*: filter by  ``device_serial_number`` 
