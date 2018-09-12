@@ -27,12 +27,10 @@ class StudySerializer(serializers.ModelSerializer):
         fields = ('study_authors', 'study_publisher','study_year', 'study_isbn','study_organization')
 
 
-
-
 class AppMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppMetric
-        fields = ('am_app', 'am_metric','am_value','am_value_text', 'am_unit','am_coeficient')
+        fields = ('am_app', 'am_metric','am_value','am_value_text','am_coeficient','am_timestamp')
 
 
 

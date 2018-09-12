@@ -309,6 +309,61 @@ class MethodMetricsView(APIView):
                 return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_400_BAD_REQUEST)
 
+
+class AppsMetricsView(APIView):
+    def get(self, request):
+        query=parse_qs(request.META['QUERY_STRING'])
+        results = Application.objects.all()
+        metrics=AppMetric.objects.all()
+        if 'app_name' in query:
+            results=results.filter(app_name=query['class_name'][0])
+        if 'app_metric' in query:
+            try:
+                metrics=metrics.filter(am_class__in=results.values('app_id'),cm_metric=query['app_metric'][0])
+                results=results.filter(app_id__in=metrics.values('am_app'))
+            except ObjectDoesNotExist:
+                pass
+        if 'app_metric_value' in query:
+            try:
+                metrics=metrics.filter(am_class__in=results.values('app_id'),cm_value=query['app_metric_value'][0])
+                results=results.filter(app_id__in=metrics.values('am_app'))
+            except ObjectDoesNotExist:
+                pass 
+        if 'app_metric_value_gte' in query:
+            try:
+                metrics=metrics.filter(am_class__in=results.values('app_id'),cm_value__gte=query['app_metric_value_gte'][0])
+                results=results.filter(app_id__in=metrics.values('am_app'))
+            except ObjectDoesNotExist:
+                pass
+        serialize = MethodSerializer(results, many=True)
+        if 'class_metric_value_lte' in query:
+            try:
+                metrics=metrics.filter(am_class__in=results.values('app_id'),cm_value__lte=query['app__metric_value_lte'][0])
+                results=results.filter(app_id__in=metrics.values('am_app'))
+            except ObjectDoesNotExist:
+                pass  
+        serialize = AppWithMetricsSerializer(results, many=True)
+        return Response(serialize.data, HTTP_200_OK)
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = AppWithMetricsSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=False):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = AppWithMetricsSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=False):
+                instance.save()
+                return Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
+
+
 class ClassMetricsView(APIView):
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -318,26 +373,26 @@ class ClassMetricsView(APIView):
             results=results.filter(class_name=query['class_name'][0])
         if 'class_metric' in query:
             try:
-                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_metric=query['method_metric'][0])
+                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_metric=query['class_metric'][0])
                 results=results.filter(class_id__in=metrics.values('cm_class'))
             except ObjectDoesNotExist:
                 pass
         if 'class_metric_value' in query:
             try:
-                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_value=query['method_metric_value'][0])
+                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value=query['class_metric_value'][0])
                 results=results.filter(class_id__in=metrics.values('cm_class'))
             except ObjectDoesNotExist:
                 pass 
         if 'class_metric_value_gte' in query:
             try:
-                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_value__gte=query['method_metric_value_gte'][0])
+                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value__gte=query['class_metric_value_gte'][0])
                 results=results.filter(class_id__in=metrics.values('cm_class'))
             except ObjectDoesNotExist:
                 pass
         serialize = MethodSerializer(results, many=True)
         if 'class_metric_value_lte' in query:
             try:
-                metrics=metrics.filter(cm_class__in=results.values('method_id'),cm_value__lte=query['method_metric_value_lte'][0])
+                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value__lte=query['class_metric_value_lte'][0])
                 results=results.filter(class_id__in=metrics.values('cm_class'))
             except ObjectDoesNotExist:
                 pass  

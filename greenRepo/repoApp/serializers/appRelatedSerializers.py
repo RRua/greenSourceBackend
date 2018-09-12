@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from repoApp.models.appRelated import *
 from repoApp.models.metricsRelated import *
-from repoApp.serializers.metricRelatedSerializers import MethodMetricSerializer, ClassMetricSerializer
+from repoApp.serializers.metricRelatedSerializers import MethodMetricSerializer, ClassMetricSerializer, AppMetricSerializer
 from django.utils import timezone
 
 
@@ -87,6 +87,8 @@ class ClassListSerializer(serializers.ListSerializer):
 
 
 
+
+
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
@@ -112,6 +114,23 @@ class ClassWithMetricsSerializer(serializers.ModelSerializer):
         list_serializer_class =ClassListSerializer
         fields = ('class_id', 'class_name', 'class_package', 'class_non_acc_mod',
             'class_app', 'class_acc_modifier', 'class_superclass', 'class_is_interface' ,'class_implemented_ifaces')
+        validators = []
+
+
+class AppWithMetricsSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super(AppWithMetricsSerializer, self).__init__(*args, **kwargs) 
+        self.fields['app_metrics'] = serializers.SerializerMethodField()
+     
+    def get_app_metrics(self, app):
+        met = AppMetric.objects.filter(am_app=app.app_id)
+        return AppMetricSerializer(instance=met,  many=True).data  
+
+    class Meta:
+        model = Application
+        #list_serializer_class =ClassListSerializer
+        list_serializer_class =ApplicationListSerializer
+        fields = ('app_id', 'app_location', 'app_description','app_version','app_flavor','app_build_type', 'app_project')
         validators = []
 
 class ClassWithImportsSerializer(serializers.ModelSerializer):

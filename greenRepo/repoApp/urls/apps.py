@@ -1,11 +1,12 @@
 from django.urls import path, re_path
 
 
-from repoApp.views.appRelated import AppsListView,AppsDetailView,AppsMethodsListView,AppsMethodsDetailView,MethodsListView, AppHasPermissionListView, AppsTestsView , AppsClassListView,AppsTestResultsView
+from repoApp.views.appRelated import AppsListView,AppsDetailView,AppsMethodsListView,AppsMethodsDetailView,MethodsListView, AppHasPermissionListView, AppsTestsView , AppsClassListView,AppsMetricsView,AppsTestResultsView
 
 urlpatterns = [
     #path('', TestsListView.as_view(), name='testRelated'),
     re_path('permissions/', AppHasPermissionListView.as_view(), name='appshas'),
+    re_path('metrics/', AppsMetricsView.as_view(), name='apps'),
     path('<slug:appid>/', AppsDetailView.as_view(), name='apps'),
     path('<slug:appid>/tests/', AppsTestsView.as_view(), name='apps'),
     path('<slug:appid>/tests/results/', AppsTestResultsView.as_view(), name='apps'),

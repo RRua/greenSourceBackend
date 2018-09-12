@@ -49,6 +49,8 @@
   - [POST /apps/<app_id>/methods/](#app-methods)
   - [GET /apps/<app_id>/methods/<method_id>/](#app-method)
   - [POST /apps/<app_id>/methods/<method_id>/](#app-method)
+  - [GET /apps/metrics/](#app-metrics)
+  - [POST /apps/metrics/](#app-metrics)
 
 - Class
   - [GET /apps/<app_id>/classes/](#get-class)
@@ -219,6 +221,97 @@ Povoa a BD com dados dummy para fins de testing.
     }
 ]
 ```
+
+
+### GET /apps/metrics/
+#### Query Parameters
+- *app_name*: filter by  ``app_name`` 
+- *app_metric*: filter by  ``app_metric`` 
+- *app_metric_value*: filter by   ``app_metric_value``
+- *app_metric_value_gte*: filter by  ``app_metric_value_gte >= value`` 
+- *app_metric_value_lte*: filter by   ``app_metric_value_lte <= value``
+
+#### Response (CODE HTTP200)
+```json
+[
+   {
+        "app_id": "dummy_app",
+        "app_location": "/Users/dummyUser/apps/dummyApp",
+        "app_description": "dumb",
+        "app_version": 1.1,
+        "app_flavor": "demo",
+        "app_build_type": "",
+        "app_project": "xxxx-dummy-xxxx-project-test",
+        "app_metrics": [
+            {
+                "am_app": "dummy_app",
+                "am_metric": "totalenergy",
+                "am_value": 131,
+                "am_value_text": "",
+                "am_coeficient": 1,
+                "am_timestamp": "2018-09-12T17:27:44.512776Z"
+            }
+        ]
+    }
+]
+```
+
+### POST /apps/metrics
+#### Body
+```json
+[
+   {
+        "app_id": "dummy_app",
+        "app_location": "/Users/dummyUser/apps/dummyApp",
+        "app_description": "dumb",
+        "app_version": 1.1,
+        "app_flavor": "demo",
+        "app_build_type": "",
+        "app_project": "xxxx-dummy-xxxx-project-test",
+        "app_metrics": [
+            {
+                "am_app": "dummy_app",
+                "am_metric": "totalenergy",
+                "am_value": 131,
+                "am_value_text": "",
+                "am_coeficient": 1,
+                "am_timestamp": "2018-09-12T17:27:44.512776Z"
+            }
+        ]
+    }
+]
+```
+
+#### Response (CODE HTTP200)
+```json
+[
+  { {
+        "app_id": "dummy_app",
+        "app_location": "/Users/dummyUser/apps/dummyApp",
+        "app_description": "dumb",
+        "app_version": 1.1,
+        "app_flavor": "demo",
+        "app_build_type": "",
+        "app_project": "xxxx-dummy-xxxx-project-test",
+        "app_metrics": [
+            {
+                "am_app": "dummy_app",
+                "am_metric": "totalenergy",
+                "am_value": 131,
+                "am_value_text": "",
+                "am_coeficient": 1,
+                "am_timestamp": "2018-09-12T17:27:44.512776Z"
+            }
+        ]
+    }
+
+]
+```
+
+
+
+
+
 
 ### GET /apps/<app_id>/
 
