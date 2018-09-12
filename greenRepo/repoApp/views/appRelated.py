@@ -54,7 +54,7 @@ class ProjectListView(APIView):
             instance = AndroidProjectSerializer(data=data, many=False, partial=True)
             if instance.is_valid(raise_exception=True):
                 instance.save()
-                Response(instance.data, HTTP_200_OK)
+                return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
@@ -95,7 +95,7 @@ class AppsListView(APIView):
             instance = ApplicationSerializer(data=data, many=False, partial=True)
             if instance.is_valid(raise_exception=True):
                 instance.save()
-                Response(instance.data, HTTP_200_OK)
+                return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_400_BAD_REQUEST)
             
 
@@ -130,12 +130,12 @@ class AppsTestResultsView(APIView):
         if 'test_orientation' in query:
             tests=tests.filter(test_orientation=query['test_orientation'][0].lower())
         results = TestResults.objects.filter(test_results_test__in=tests.values('id'))
-        if 'device' in query:
-            results=results.filter(test_results_device=query['device'][0])
-        if 'profiler' in query:
-            results=results.filter(test_results_profiler=query['profiler'][0])
-        if 'seed' in query:
-            results=results.filter(test_results_seed=query['seed'][0])
+        if 'test_device' in query:
+            results=results.filter(test_results_device=query['test_device'][0])
+        if 'test_profiler' in query:
+            results=results.filter(test_results_profiler=query['test_profiler'][0])
+        if 'test_seed' in query:
+            results=results.filter(test_results_seed=query['test_seed'][0])
         serialize = TestResultsWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
@@ -176,7 +176,7 @@ class AppsClassListView(APIView):
             instance = ClassSerializer(data=data, many=False, partial=True)
             if instance.is_valid(raise_exception=True):
                 instance.save()
-                Response(instance.data, HTTP_200_OK)
+                return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
@@ -226,32 +226,32 @@ class MethodsListView(APIView):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Method.objects.all()
         metrics=MethodMetric.objects.all()
-        if 'class' in query:
-            results=results.filter(method_class=query['class'][0])
-        if 'method' in query:
-            results=results.filter(method_name=query['method'][0])
-        if 'metric' in query:
+        if 'method_class' in query:
+            results=results.filter(method_class=query['method_class'][0])
+        if 'method_name' in query:
+            results=results.filter(method_name=query['method_name'][0])
+        if 'method_metric' in query:
             try:
-                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_metric=query['metric'][0])
+                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_metric=query['method_metric'][0])
                 results=results.filter(method_id__in=metrics.values('mm_method'))
             except ObjectDoesNotExist:
                 pass
-        if 'metric_value' in query:
+        if 'method_metric_value' in query:
             try:
-                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_value=query['metric_value'][0])
+                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_value=query['method_metric_value'][0])
                 results=results.filter(method_id__in=metrics.values('mm_method'))
             except ObjectDoesNotExist:
                 pass 
-        if 'metric_value_gte' in query:
+        if 'method_metric_value_gte' in query:
             try:
-                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_value__gte=query['metric_value_gte'][0])
+                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_value__gte=query['method_metric_value_gte'][0])
                 results=results.filter(method_id__in=metrics.values('mm_method'))
             except ObjectDoesNotExist:
                 pass  
         serialize = MethodSerializer(results, many=True)
-        if 'metric_value_lte' in query:
+        if 'method_metric_value_lte' in query:
             try:
-                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_value__lte=query['metric_value_lte'][0])
+                metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_value__lte=query['method_metric_value_lte'][0])
                 results=results.filter(method_id__in=metrics.values('mm_method'))
             except ObjectDoesNotExist:
                 pass  
@@ -260,66 +260,81 @@ class MethodsListView(APIView):
     
     def post(self, request):
         data = JSONParser().parse(request)
-        serializer = MethodSerializer(data=data, many=isinstance(data,list), partial=True)
-        try:
-            if serializer.is_valid(raise_exception=True):
-                if isinstance(data,list):
-                    for item in data:
-                        try:
-                            instance = MethodSerializer(data=item, many=False, partial=True)
-                            if instance.is_valid(raise_exception=True):
-                                instance.save()
-                            #serializer = TestSerializer(instance, many=isinstance(data,list))
-                        except Exception as e:
-                            print(e)
-                            continue
-                return Response(serializer.data, HTTP_200_OK)
-            else:
-                return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            print(e)
-            return Response(serializer.data, HTTP_200_OK)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = MethodSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=False):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = MethodSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=False):
+                instance.save()
+                return Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
 class MethodMetricsView(APIView):
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Method.objects.all()
-        if 'app_id' in query:
-            results=results.filter(application=query['app_id'][0])
-        if 'permission' in query:
-            results=results.filter(permission=query['permission'][0].lower())
+        if 'method_app' in query:
+            classes = Class.objects.filter(class_app=query['method_app'][0])
+            results=results.filter(method_class__in=classes.values('class_id'))
+        if 'method_class' in query:
+            classes=classes.filter(method_class=query['method_class'][0])
+        if 'method_name' in query:
+            results=results.filter(method_name=query['method_name'][0])
         serialize = MethodWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
     def post(self, request):
         data = JSONParser().parse(request)
-        #print(data)
-        serializer = MethodMetricSerializer(data=data,many=isinstance(data, list), partial=True)
-        if serializer.is_valid(raise_exception=True):
-            if isinstance(data,list):
-                for item in data:
-                    try:
-                        instance = MethodMetricSerializer(data=item, many=False, partial=True)
-                        if instance.is_valid(raise_exception=True):
-                            instance.save()
-                        #serializer = TestSerializer(instance, many=isinstance(data,list))
-                    except IntegrityError as e:
-                        continue
-            return Response(serializer.data, HTTP_200_OK)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = MethodWithMetricsSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=False):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
         else:
-            return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
+            instance = MethodWithMetricsSerializer(data=data, many=False, partial=True)
+            if instance.is_valid(raise_exception=False):
+                instance.save()
+                return Response(instance.data, HTTP_200_OK)
+            return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
 class MethodInvokedListView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
-        serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
-        if serializer.is_valid(raise_exception=True):
-            
-            return Response(serializer.data, HTTP_200_OK)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = MethodInvokedSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=True):
+                        instance.save()
+                except ObjectDoesNotExist as e:
+                    print(e)
+                    continue
+                except Exception as e:
+                    print(e)
+                    continue
+            return Response(data, HTTP_200_OK)
         else:
-            return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
+            try:
+                instance = MethodInvokedSerializer(data=data, many=False, partial=True)
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+                    return Response(instance.data, HTTP_200_OK)
+            except Exception as e:
+                print(e)
+                return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
 

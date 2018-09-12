@@ -165,7 +165,7 @@ class MethodWithMetricsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Method
-        #list_serializer_class = MethodListSerializer
+        list_serializer_class = MethodListSerializer
         fields = ('method_id', 'method_name','method_acc_modifier', 'method_non_acc_mod','method_class')
         validators = []
 
@@ -173,7 +173,7 @@ class MethodWithMetricsSerializer(serializers.ModelSerializer):
 class MethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Method
-        list_serializer_class = MethodListSerializer
+        #list_serializer_class = MethodListSerializer
         fields = ('method_id', 'method_name', 'method_class','method_acc_modifier', 'method_non_acc_mod')
         validators = []
 
