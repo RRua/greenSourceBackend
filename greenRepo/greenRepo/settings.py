@@ -83,16 +83,25 @@ WSGI_APPLICATION = 'greenRepo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'greenrepo',
+#        'USER': 'greenlab',
+#        'PASSWORD': 'greens',
+#        'HOST': 'localhost',
+#    }
+#}
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'greenrepo',
-        'USER': 'greenlab',
-        'PASSWORD': 'greens',
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'read_default_file': './my.cnf',
+            'init_command': 'SET default_storage_engine=INNODB',
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

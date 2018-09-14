@@ -31,34 +31,42 @@ class TestsListView(APIView):
         serialize = TestSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
+            ids_to_retrieve = []
             for item in data:
-                try:
-                    instance = TestSerializer(data=item, many=False, partial=True)
-                    if instance.is_valid(raise_exception=True):
-                        instance.save()
-                        return Response(data, HTTP_200_OK)
-                except IntegrityError as e:
-                   print (e.code)
-                   print (repr(e))
-                   continue
-                except Exception as e:
-                   continue
-                   #print (e.message)
-            return Response(data, HTTP_200_OK)
+                serializer = TestSerializer(data=item, many=False, partial=True)
+                if serializer.is_valid(raise_exception=True):
+                    try:
+                        instance = serializer.create(serializer.validated_data)
+                        xx = instance.save()
+                        ids_to_retrieve.append(xx.id)
+                    except IntegrityError as e:
+                        obj = Test.objects.get(test_application=serializer.validated_data['test_application'],test_tool=serializer.validated_data['test_tool'],test_orientation=serializer.validated_data['test_orientation'])
+                        ids_to_retrieve.append(obj.id)
+                    except Exception as e:
+                        continue
+                else:
+                    return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
+            objs = Test.objects.filter(id__in=ids_to_retrieve)
+            total=TestSerializer(objs,many=True)
+            return Response(total.data, HTTP_200_OK)
+            if total.is_valid(raise_exception=True):
+                return Response(total, HTTP_200_OK)
+            else:
+                return Response(status=HTTP_400_BAD_REQUEST)
         else:
-            instance = TestSerializer(data=data, many=False, partial=True)
-            try:
-                if instance.is_valid(raise_exception=True):
+            serializer = TestSerializer(data=data, many=False, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                try:
+                    instance = serializer.create(serializer.validated_data)
                     instance.save()
-                    res = TestSerializer(instance, many=False)
-                    return Response(res.data, HTTP_200_OK)
-            except Exception as e:
-                return Response(data, HTTP_200_OK)
-
+                    return Response(TestSerializer(instance, many=False).data, HTTP_200_OK)
+                except IntegrityError as e:
+                    obj = Test.objects.get(test_application=serializer.validated_data['test_application'],test_tool=serializer.validated_data['test_tool'],test_orientation=serializer.validated_data['test_orientation'])
+                    return Response(TestSerializer(obj, many=False).data, HTTP_200_OK)     
+        return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
 
 class ResultsTestListView(APIView):
     def get(self, request,testid):
