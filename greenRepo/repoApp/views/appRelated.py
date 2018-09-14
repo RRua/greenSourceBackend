@@ -52,10 +52,13 @@ class ProjectListView(APIView):
             return Response(data, HTTP_200_OK)
         else:
             instance = AndroidProjectSerializer(data=data, many=False, partial=True)
-            if instance.is_valid(raise_exception=True):
-                instance.save()
-                return Response(instance.data, HTTP_200_OK)
-            return Response(instance.data, HTTP_400_BAD_REQUEST)
+            try:
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+            except Exception as e:
+                pass
+            return Response(instance.data, HTTP_200_OK)
+        return Response(instance.data, HTTP_400_BAD_REQUEST)
 
 
 class AppsListView(APIView):
@@ -82,6 +85,7 @@ class AppsListView(APIView):
     #adiciona apps mesmo tendo no meio apps que ja existam
     def post(self, request):
         data = JSONParser().parse(request) 
+        #print(data)
         if isinstance(data,list):
             for item in data:
                 try:
@@ -93,6 +97,7 @@ class AppsListView(APIView):
             return Response(data, HTTP_200_OK)
         else:
             instance = ApplicationSerializer(data=data, many=False, partial=True)
+            print(instance)
             if instance.is_valid(raise_exception=True):
                 instance.save()
                 return Response(instance.data, HTTP_200_OK)

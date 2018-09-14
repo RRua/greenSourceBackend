@@ -1,4 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import *
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -37,18 +37,27 @@ class TestsListView(APIView):
         if isinstance(data,list):
             for item in data:
                 try:
-                    instance = AndroidProjectSerializer(data=item, many=False, partial=True)
+                    instance = TestSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
+                        return Response(data, HTTP_200_OK)
+                except IntegrityError as e:
+                   print (e.code)
+                   print (repr(e))
+                   continue
                 except Exception as e:
-                    continue
+                   continue
+                   #print (e.message)
             return Response(data, HTTP_200_OK)
         else:
-            instance = AndroidProjectSerializer(data=data, many=False, partial=True)
-            if instance.is_valid(raise_exception=True):
-                instance.save()
-                Response(instance.data, HTTP_200_OK)
-        return Response(instance.data, HTTP_400_BAD_REQUEST)
+            instance = TestSerializer(data=data, many=False, partial=True)
+            try:
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+                    res = TestSerializer(instance, many=False)
+                    return Response(res.data, HTTP_200_OK)
+            except Exception as e:
+                return Response(data, HTTP_200_OK)
 
 
 class ResultsTestListView(APIView):
