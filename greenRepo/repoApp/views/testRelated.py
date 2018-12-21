@@ -66,7 +66,7 @@ class TestsListView(APIView):
                 except IntegrityError as e:
                     obj = Test.objects.get(test_application=serializer.validated_data['test_application'],test_tool=serializer.validated_data['test_tool'],test_orientation=serializer.validated_data['test_orientation'])
                     return Response(TestSerializer(obj, many=False).data, HTTP_200_OK)     
-        return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
+        return Response('Internal error or malformed JSON ', HTTP_200_OK)
 
 class ResultsTestListView(APIView):
     def get(self, request,testid):
@@ -87,7 +87,7 @@ class ResultsTestListView(APIView):
 
 
     def post(self, request,testid):
-        data = JSONParser().parse(request)
+        data = JSONParser().parse(request) 
         if isinstance(data,list):
             for item in data:
                 try:
@@ -99,10 +99,13 @@ class ResultsTestListView(APIView):
             return Response(data, HTTP_200_OK)
         else:
             instance = TestResultsSerializer(data=data, many=False, partial=True)
-            if instance.is_valid(raise_exception=True):
-                instance.save()
-                Response(instance.data, HTTP_200_OK)
-            return Response(instance.data, HTTP_400_BAD_REQUEST)
+            try:
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+            except Exception as e:
+                pass
+            return Response(instance.data, HTTP_200_OK)
+        return Response(instance.data, HTTP_200_OK)
 
 
 def getMetrics(initial_data):
@@ -134,7 +137,7 @@ class ResultsListView(APIView):
         if 'test_results_description' in query:
             results=results.filter(test_results_description__contains=query['test_results_description'][0])
         serializer = TestResultsSerializer(results, many=True)
-
+        return Response(serializer.data, HTTP_200_OK)
 
     def post(self, request):
         data = JSONParser().parse(request)
@@ -153,7 +156,7 @@ class ResultsListView(APIView):
             if instance.is_valid(raise_exception=True):
                 instance.save()
                 Response(instance.data, HTTP_200_OK)
-            return Response(instance.data, HTTP_400_BAD_REQUEST)
+            return Response(instance.data, HTTP_200_OK)
 
 class TestMetricsListView(APIView):
     def get(self, request):
@@ -173,18 +176,21 @@ class TestMetricsListView(APIView):
         if isinstance(data,list):
             for item in data:
                 try:
-                    instance = TestResultsSerializer(data=item, many=False, partial=True)
+                    instance = TestMetricSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
                 except Exception as e:
                     continue
             return Response(data, HTTP_200_OK)
         else:
-            instance = TestResultsSerializer(data=data, many=False, partial=True)
-            if instance.is_valid(raise_exception=True):
-                instance.save()
-                Response(instance.data, HTTP_200_OK)
-            return Response(instance.data, HTTP_400_BAD_REQUEST)
+            instance = TestMetricSerializer(data=data, many=False, partial=True)
+            try:
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+            except Exception as e:
+                pass
+            return Response(instance.data, HTTP_200_OK)
+        return Response(instance.data, HTTP_200_OK)
 
 
 
@@ -197,7 +203,7 @@ class TestResultsListView(APIView):
             #erialize = TestResultsSerializer(instance, many=isinstance(data,list))
             return Response(serializer.data, HTTP_200_OK)
         else:
-            return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
+            return Response('Internal error or malformed JSON ', HTTP_200_OK)
 
 
 

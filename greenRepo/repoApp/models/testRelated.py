@@ -78,7 +78,7 @@ class MethodInvoked(models.Model):
         unique_together = (('method','test_results'),)
     method = models.ForeignKey(Method, related_name='method', on_delete=models.CASCADE)
     test_results = models.ForeignKey(TestResults, related_name='results', on_delete=models.CASCADE)
-
+    times_invoked = models.IntegerField(default=1)
 
 
 

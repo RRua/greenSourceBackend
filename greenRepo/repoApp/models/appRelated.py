@@ -33,8 +33,8 @@ class Application(models.Model):
     app_project = models.ForeignKey(AndroidProject, related_name='belongs_project', on_delete=models.CASCADE)
 
 class Class(models.Model):
-    class_id = models.CharField(primary_key=True,max_length=96)
-    class_name = models.CharField(max_length=32)
+    class_id = models.CharField(primary_key=True,max_length=256)
+    class_name = models.CharField(max_length=64)
     class_package = models.CharField(max_length=32)
     class_non_acc_mod = models.CharField(max_length=32, default="",blank=True)
     class_app = models.ForeignKey(Application, related_name='belongs_app', on_delete=models.CASCADE)
@@ -58,7 +58,7 @@ class ImportClass(models.Model):
 class Method(models.Model):
     class Meta:
         unique_together = (('method_name', 'method_class','method_id'),)
-    method_id = models.CharField(primary_key=True,max_length=384)
+    method_id = models.CharField(primary_key=True,max_length=255)
     method_name = models.CharField(max_length=256)
     #method_hash_args = models.CharField(max_length=34,default="")
     method_non_acc_mod = models.CharField(max_length=32,default="",blank=True)

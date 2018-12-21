@@ -104,10 +104,14 @@ class ClassWithMetricsSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super(ClassWithMetricsSerializer, self).__init__(*args, **kwargs) 
         self.fields['class_metrics'] = serializers.SerializerMethodField()
+        self.fields['class_imports'] = serializers.SerializerMethodField()
      
     def get_class_metrics(self, classe):
         met = ClassMetric.objects.filter(cm_class=classe.class_id)
         return ClassMetricSerializer(instance=met,  many=True).data  
+    def get_class_imports(self, classe):
+        met = ImportClass.objects.filter(import_class=classe.import_class)
+        return ImportClassSerializer(instance=met,  many=True).data  
 
     class Meta:
         model = Class

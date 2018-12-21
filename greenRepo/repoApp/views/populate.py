@@ -384,6 +384,24 @@ class PopulateView(APIView):
             a.save()
         except Exception as e:
             print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="AvgCPULoad"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="MaxCPULoad"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
         try:
             a = Metric()
             a.metric_name="ScreenState"
@@ -426,12 +444,21 @@ class PopulateView(APIView):
             print(e)
         try:
             a = Metric()
-            a.metric_name="Memory"
+            a.metric_name="MaxMemory"
             a.metric_type='d'
             a.metric_category='m'
             a.save()
         except Exception as e:
             print(e)
+        try:
+            a = Metric()
+            a.metric_name="AvgMemory"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
         try:
             a = Metric()
             a.metric_name="time"

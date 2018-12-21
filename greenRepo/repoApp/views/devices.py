@@ -41,7 +41,10 @@ class DevicesListView(APIView):
             return Response(data, HTTP_200_OK)
         else:
             instance = DeviceSerializer(data=data, many=False, partial=True)
-            if instance.is_valid(raise_exception=True):
-                instance.save()
-                Response(instance.data, HTTP_200_OK)
-            return Response(instance.data, HTTP_400_BAD_REQUEST)
+            try:
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+            except Exception as e:
+                pass
+            return Response(instance.data, HTTP_200_OK)
+        return Response(instance.data, HTTP_200_OK)
