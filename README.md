@@ -1,21 +1,7 @@
 # greenSourceBackend
 
-##SETUP
 
-###ctivate virtual env
-####source greenRepoVirtualEnv/bin/activate
-
-###create  and setup database
-####TODO
-####psql -h localhost -U postgres -d watergenius
-
-####CREATE DATABASE repoApp;
-
-###install required packages
-
-####pip install -r requirements.txt --upgrade
-
-## START SERVER
+# GreenSource
 ####python manage.py makemigrations
 ####python manage.py migrate
 ####python manage.py runserver
