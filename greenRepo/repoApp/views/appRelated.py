@@ -95,11 +95,13 @@ class AppsListView(APIView):
                     continue
             return Response(data, HTTP_200_OK)
         else:
+
             instance = ApplicationSerializer(data=data, many=False, partial=True)
             try:
                 if instance.is_valid(raise_exception=True):
                     instance.save()
             except Exception as e:
+                print(e)
                 pass
             return Response(instance.data, HTTP_200_OK)
         return Response(instance.data, HTTP_200_OK)

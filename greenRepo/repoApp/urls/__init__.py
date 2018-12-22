@@ -1,5 +1,5 @@
 from django.urls import path, include
-from repoApp.views.populate import PopulateView, PopulateDummyTest
+from repoApp.views.populate import PopulateView, PopulateDummyTest, PopulationReset
 
 urlpatterns = [
 	path('projects/', include('repoApp.urls.projects')),
@@ -9,6 +9,7 @@ urlpatterns = [
     path('apps/', include('repoApp.urls.apps')),
     path('methods/', include('repoApp.urls.methods')),
     path('classes/', include('repoApp.urls.classes')),
+    path('resetpopulation/', PopulationReset.as_view(), name='populatereset'),
     path('populate/', PopulateView.as_view(), name='populate'),
     path('populateTest/', PopulateDummyTest.as_view(), name='pop'),
 ]

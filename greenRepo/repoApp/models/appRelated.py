@@ -24,7 +24,7 @@ class AndroidProject(models.Model):
 
 
 class Application(models.Model):
-    app_id = models.CharField(max_length=128,primary_key=True)
+    app_id = models.CharField(max_length=256,primary_key=True)
     app_location= models.CharField(max_length=512)
     app_description = models.CharField(max_length=64,default="",blank=True)
     app_version= models.FloatField(default=1)

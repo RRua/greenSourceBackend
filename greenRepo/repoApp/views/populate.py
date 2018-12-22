@@ -157,6 +157,34 @@ class PopulateDummyTest(APIView):
         return Response("DB Populated with dummy examples", HTTP_200_OK)
 
 
+
+class PopulationReset(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        try:
+            AppMetric.objects.all().delete()
+            MethodMetric.objects.all().delete()
+            ClassMetric.objects.all().delete()
+            TestMetric.objects.all().delete()
+            TestResults.objects.all().delete()
+            Test.objects.all().delete()
+            Method.objects.all().delete()
+            ImportClass.objects.all().delete()
+            Class.objects.all().delete()
+            Application.objects.all().delete()
+            AndroidProject.objects.all().delete()
+            Metric.objects.all().delete()
+            #TestOrientation.objects.all().delete()
+            #Profiler.objects.all().delete()
+            pv = PopulateView()
+            pv.post(request)
+        except Exception as e:
+            print (e)
+
+        return Response("DB reseted", HTTP_200_OK)
+
+
+
 class PopulateView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -1171,6 +1199,7 @@ class PopulateView(APIView):
 
         return Response("nice", HTTP_200_OK)
        
+
 
 
 
