@@ -110,7 +110,7 @@ class ClassWithMetricsSerializer(serializers.ModelSerializer):
         met = ClassMetric.objects.filter(cm_class=classe.class_id)
         return ClassMetricSerializer(instance=met,  many=True).data  
     def get_class_imports(self, classe):
-        met = ImportClass.objects.filter(import_class=classe.import_class)
+        met = ImportClass.objects.filter(import_class=classe.class_id)
         return ImportClassSerializer(instance=met,  many=True).data  
 
     class Meta:
@@ -143,13 +143,13 @@ class ClassWithImportsSerializer(serializers.ModelSerializer):
         self.fields['class_imports'] = serializers.SerializerMethodField()
      
     def get_class_imports(self, classe):
-        met = ImportClass.objects.filter(import_class=classe.import_class)
+        met = ImportClass.objects.filter(import_class=classe.class_id)
         return ImportClassSerializer(instance=met,  many=True).data  
 
     class Meta:
         model = Class
-        list_serializer_class =ClassListSerializer
-        fields = ('class_id', 'class_name', 'class_package', 'class_non_acc_mod',
+        list_serializer_class =ClassWithMetricsSerializer()
+        fields = ('class_id' ,'class_name', 'class_package', 'class_non_acc_mod',
             'class_app', 'class_acc_modifier', 'class_superclass', 'class_is_interface' ,'class_implemented_ifaces')
         validators = []
 

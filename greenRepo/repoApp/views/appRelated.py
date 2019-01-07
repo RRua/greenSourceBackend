@@ -414,7 +414,7 @@ class ClassMetricsView(APIView):
         if isinstance(data,list):
             for item in data:
                 try:
-                    instance = ClassSerializer(data=item, many=False, partial=True)
+                    instance = ClassMetricSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
                 except Exception as e:
@@ -422,7 +422,7 @@ class ClassMetricsView(APIView):
                     continue
             return Response(data, HTTP_200_OK)
         else:
-            instance = ClassSerializer(data=data, many=False, partial=True)
+            instance = ClassMetricSerializer(data=data, many=False, partial=True)
             if instance.is_valid(raise_exception=False):
                 instance.save()
                 return Response(instance.data, HTTP_200_OK)
@@ -432,30 +432,23 @@ class ClassMetricsView(APIView):
 class MethodInvokedListView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
-        if isinstance(data,list):
-            for item in data:
-                try:
-                    instance = MethodInvokedSerializer(data=item, many=False, partial=True)
-                    if instance.is_valid(raise_exception=True):
-                        instance.save()
-                except ObjectDoesNotExist as e:
-                    print(e)
-                    continue
-                except Exception as e:
-                    print(e)
-                    continue
-            return Response(data, HTTP_200_OK)
+        serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
+        if serializer.is_valid(raise_exception=True):
+            if isinstance(data,list):
+                for item in data:
+                    try:
+                        instance = MethodInvokedSerializer(data=item, many=False, partial=True)
+                        if instance.is_valid(raise_exception=True):
+                            instance.save()
+                        #serializer = TestSerializer(instance, many=isinstance(data,list))
+                    except Exception as e:
+                        continue
+            return Response(serializer.data, HTTP_200_OK)
         else:
-            try:
-                instance = MethodInvokedSerializer(data=data, many=False, partial=True)
-                if instance.is_valid(raise_exception=True):
-                    instance.save()
-                    return Response(instance.data, HTTP_200_OK)
-            except Exception as e:
-                print(e)
-                return Response(instance.data, HTTP_400_BAD_REQUEST)
+            return Response('Internal error or malformed JSON ', HTTP_200_OK)
 
 
+# /classes/
 class ClassesListView(APIView):
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -525,4 +518,41 @@ class AppHasPermissionListView(APIView):
             results=results.filter(permission=query['permission'][0].lower())
         serialize = AppHasPermissionSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
+
+class ImportListView(APIView):
+    def get(self, request):
+        query=parse_qs(request.META['QUERY_STRING'])
+        results = ImportClass.objects.all()
+        if 'import_class' in query:
+            results=results.filter(import_class=query['import_class'][0])
+        if 'import_name' in query:
+            results=results.filter(import_name=query['import_name'][0].lower())
+        serialize = ImportClassSerializer(results, many=True)
+        return Response(serialize.data, HTTP_200_OK)
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        serializer = ImportClassSerializer(data=data, many=isinstance(data,list), partial=True)
+        if serializer.is_valid(raise_exception=True):
+            if isinstance(data,list):
+                for item in data:
+                    try:
+                        instance = ImportClassSerializer(data=item, many=False, partial=True)
+                        if instance.is_valid(raise_exception=True):
+                            instance.save()
+                    except IntegrityError as e:
+                        continue
+            return Response(serializer.data, HTTP_200_OK)
+        else:
+            return Response('Internal error or malformed JSON ', HTTP_200_OK)
+
+    
+
+
+
+
+
+
+
+
 

@@ -60,13 +60,13 @@ class AppMetric(models.Model):
 
 class ClassMetric(models.Model):
     class Meta:
-        unique_together = (('cm_class','cm_timestamp'),)
+        unique_together = (('cm_class', 'cm_metric','cm_timestamp'),)
     cm_class = models.ForeignKey(Class, related_name='classmetric', on_delete=models.CASCADE)
     cm_metric = models.ForeignKey(Metric, related_name='chasMetric', on_delete=models.CASCADE)
     cm_value = models.FloatField()
     cm_value_text = models.CharField(max_length=32,default="")
     cm_coeficient = models.IntegerField(default=1)
-    cm_timestamp = models.DateTimeField(default=now)
+    cm_timestamp = models.DateTimeField( default=now)
 
 class MethodMetric(models.Model):
     class Meta:

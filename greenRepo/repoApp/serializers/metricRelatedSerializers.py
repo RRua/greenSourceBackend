@@ -38,7 +38,7 @@ class ClassMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassMetric
         fields = ('cm_class','cm_timestamp', 'cm_metric','cm_value','cm_coeficient','cm_value_text')
-
+        validators = []
 
 
 

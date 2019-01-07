@@ -246,6 +246,14 @@ class PopulateView(APIView):
             print(e)
         try:
             a = Metric()
+            a.metric_name="nr_methods"
+            a.metric_type='s'
+            a.metric_category='o'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
             a.metric_name="WifiRSSILevel"
             a.metric_category='h'
             a.metric_type='d'
