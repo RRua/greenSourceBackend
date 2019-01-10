@@ -33,7 +33,7 @@ class Application(models.Model):
     app_project = models.ForeignKey(AndroidProject, related_name='belongs_project', on_delete=models.CASCADE)
 
 class Class(models.Model):
-    class_id = models.CharField(primary_key=True,max_length=256)
+    class_id = models.CharField(primary_key=True,max_length=255)
     class_name = models.CharField(max_length=64)
     class_package = models.CharField(max_length=32)
     class_non_acc_mod = models.CharField(max_length=32, default="",blank=True)
@@ -42,7 +42,7 @@ class Class(models.Model):
     class_superclass = models.CharField(max_length=64, default="",blank=True)
     class_is_interface = models.BooleanField(default=False)
     #class_n_vars = models.IntegerField()
-    class_implemented_ifaces = models.CharField(max_length=256,default="",blank=True)
+    class_implemented_ifaces = models.CharField(max_length=255,default="",blank=True)
 
 class ImportClass(models.Model):
     class Meta:
@@ -59,7 +59,7 @@ class Method(models.Model):
     class Meta:
         unique_together = (('method_name', 'method_class','method_id'),)
     method_id = models.CharField(primary_key=True,max_length=255)
-    method_name = models.CharField(max_length=256)
+    method_name = models.CharField(max_length=255)
     #method_hash_args = models.CharField(max_length=34,default="")
     method_non_acc_mod = models.CharField(max_length=32,default="",blank=True)
     method_acc_modifier = models.CharField(max_length=16,default="",blank=True)
