@@ -433,19 +433,19 @@ class MethodInvokedListView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid(raise_exception=False):
             if isinstance(data,list):
                 for item in data:
                     try:
                         instance = MethodInvokedSerializer(data=item, many=False, partial=True)
-                        if instance.is_valid(raise_exception=True):
+                        if instance.is_valid(raise_exception=False):
                             instance.save()
                         #serializer = TestSerializer(instance, many=isinstance(data,list))
                     except Exception as e:
                         continue
             return Response(serializer.data, HTTP_200_OK)
         else:
-            return Response('Internal error or malformed JSON ', HTTP_200_OK)
+            return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
 
 
 # /classes/
