@@ -9,6 +9,7 @@ greenRepo/greenRepo/settings.py
 /__pycache__/
 # C extensions
 *.so
+*/migrations/*
 
 # Distribution / packaging
 bin/

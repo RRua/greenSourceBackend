@@ -55,6 +55,6 @@ class MethodMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = MethodMetric
         list_serializer_class = MethodMetricListSerializer
-        fields = ('mm_method', 'mm_metric','mm_value', 'mm_coeficient','mm_method_invoked')
+        fields = ('mm_method', 'mm_metric','mm_value', 'mm_coeficient','mm_test')
         validators = []
         

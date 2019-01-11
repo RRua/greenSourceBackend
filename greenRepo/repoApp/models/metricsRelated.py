@@ -77,5 +77,8 @@ class MethodMetric(models.Model):
     mm_value_text = models.CharField(max_length=32, default="")
     mm_coeficient = models.IntegerField(default=1)
     mm_timestamp = models.DateTimeField(default=now)
-    mm_method_invoked = models.ForeignKey(MethodInvoked, related_name='mmmethodHasMetric', on_delete=models.CASCADE,default=None,null=True)
+    mm_test = models.ForeignKey(TestResults, related_name='mmmtest', on_delete=models.CASCADE,default=None,null=True)
+
+
+    #mm_method_invoked = models.ForeignKey(MethodInvoked, related_name='mmmethodHasMetric', on_delete=models.CASCADE,default=None,null=True)
 

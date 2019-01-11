@@ -197,14 +197,19 @@ class TestMetricsListView(APIView):
 class TestResultsListView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
+        #print(data)
         serializer = TestResultsSerializer(data=data, many=isinstance(data,list), partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            #erialize = TestResultsSerializer(instance, many=isinstance(data,list))
-            return Response(serializer.data, HTTP_200_OK)
-        else:
+        try:
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                #erialize = TestResultsSerializer(instance, many=isinstance(data,list))
+                return Response(serializer.data, HTTP_200_OK)
+            else:
+                return Response('Internal error or malformed JSON ', HTTP_200_OK)
+        except Exception as e:
+            print (e)
             return Response('Internal error or malformed JSON ', HTTP_200_OK)
-
+            
 
 
 

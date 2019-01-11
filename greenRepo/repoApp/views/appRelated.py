@@ -262,8 +262,11 @@ class MethodsListView(APIView):
                 metrics=metrics.filter(mm_method__in=results.values('method_id'),mm_value__lte=query['method_metric_value_lte'][0])
                 results=results.filter(method_id__in=metrics.values('mm_method'))
             except ObjectDoesNotExist:
-                pass  
-        serialize = MethodWithMetricsSerializer(results, many=True)
+                pass
+        if len(query)==0:
+              serialize = MethodSerializer(results, many=True)  
+        else:
+            serialize = MethodWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
     
     def post(self, request):
@@ -430,6 +433,18 @@ class ClassMetricsView(APIView):
 
 
 class MethodInvokedListView(APIView):
+    def get(self, request):
+        query=parse_qs(request.META['QUERY_STRING'])
+        results = MethodInvoked.objects.all()
+        if 'method' in query:
+            results=results.filter(method=query['method'][0])
+        if 'test_results' in query:
+            results=results.filter(test_results=query['test_results'][0])
+        if 'times_invoked' in query:
+            results=results.filter(times_invoked=query['times_invoked'][0])
+        serialize = MethodInvokedSerializer(results, many=True)
+        return Response(serialize.data, HTTP_200_OK)
+
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
