@@ -26,10 +26,10 @@ class AndroidProject(models.Model):
 class Application(models.Model):
     app_id = models.CharField(max_length=255,primary_key=True)
     app_location= models.CharField(max_length=512)
-    app_description = models.CharField(max_length=64,default="",blank=True)
+    app_description = models.CharField(max_length=64,default="",blank=True, null=True )
     app_version= models.FloatField(default=1)
-    app_flavor= models.CharField(max_length=32, default="")
-    app_build_type = models.CharField(max_length=16,default="",blank=True)
+    app_flavor= models.CharField(max_length=32, default="", null=True , blank=True)
+    app_build_type = models.CharField(max_length=16,default="",blank=True , null=True)
     app_project = models.ForeignKey(AndroidProject, related_name='belongs_project', on_delete=models.CASCADE)
 
 class Class(models.Model):
