@@ -1,5 +1,5 @@
 # greenSourceBackend
-
+![alt text](https://raw.githubusercontent.com/RRua/greenSourceBackend/master/db_schema.png)
 
 # GreenSource
 ####python manage.py makemigrations
