@@ -10,19 +10,20 @@ from repoApp.serializers.metricRelatedSerializers import MetricSerializer
 
 # Create your views here.
 class AllMetricsListView(APIView):
-	def get(self, request):
-	        query=parse_qs(request.META['QUERY_STRING'])
-	        results = Metric.objects.all()
-	        if 'metric_name' in query:
-	            results=results.filter(metric_name=query['metric_name'][0])
-	        if 'metric_category' in query:
-	            results=results.filter(metric_category=query['metric_category'][0])
-	        if 'metric_type' in query:
-	            results=results.filter(metric_type=query['metric_type'][0])
-	        serialize = MetricSerializer(results, many=True)
-	        return Response(serialize.data, HTTP_200_OK)
+    def get(self, request):
+            query=parse_qs(request.META['QUERY_STRING'])
+            results = Metric.objects.all()
+            if 'metric_name' in query:
+                results=results.filter(metric_name=query['metric_name'][0])
+            if 'metric_category' in query:
+                results=results.filter(metric_category=query['metric_category'][0])
+            if 'metric_type' in query:
+                results=results.filter(metric_type=query['metric_type'][0])
+            serialize = MetricSerializer(results, many=True)
+            return Response(serialize.data, HTTP_200_OK)
 
-	data = JSONParser().parse(request) 
+    def post(self, request):        
+        data = JSONParser().parse(request) 
         if isinstance(data,list):
             for item in data:
                 try:
