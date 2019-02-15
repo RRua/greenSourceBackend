@@ -7,6 +7,10 @@ class MetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metric
         fields = ('metric_name', 'metric_type','metric_category', 'metric_related_study')
+    #    fields = ('__all__')
+    #metric_name = serializers.CharField(max_length=32, required=True)
+    #metric_type = EnumField(MetricType, max_length=1)
+    #metric_category = EnumField(MetricCategory, max_length=1)
 
 
 class TestMetricListSerializer(serializers.ListSerializer):

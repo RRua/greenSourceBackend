@@ -64,25 +64,25 @@ class Test(models.Model):
 
 class TestResults(models.Model):
     test_results_id = models.AutoField(primary_key=True)
-    test_results_timestamp = models.DateTimeField(default=now)
+    test_results_unix_timestamp = models.IntegerField(default=1, unique=True)
     test_results_seed = models.CharField(max_length=32, default="", blank=True, null=True)
     test_results_description = models.CharField(max_length=100, default="", blank=True, null=True)
     test_results_test= models.ForeignKey(Test, related_name='test', on_delete=models.CASCADE)
     test_results_profiler= models.ForeignKey(Profiler, related_name='profiledOn', on_delete=models.CASCADE)
     test_results_device= models.ForeignKey(Device, related_name='testedOn', on_delete=models.CASCADE)
-    #test_results_device_begin_state= models.ForeignKey(DeviceState, related_name='begin_state', on_delete=models.CASCADE,null=True)
-    #test_results_device_end_state= models.ForeignKey(DeviceState, related_name='end_state', on_delete=models.CASCADE,null=True)
-    test_init_mem = models.IntegerField(default=None,null=True)
-    test_init_cpu_free = models.FloatField(default=None,null=True)
-    test_init_nr_processes_running = models.IntegerField(default=None,null=True)
-    #test_init_api_level = models.FloatField(default=None,null=True)
-    #test_init_android_version = models.FloatField(default=None,null=True)
-    test_end_mem = models.IntegerField(default=None,null=True)
-    test_end_cpu_free = models.FloatField(default=None, null=True)
-    test_end_nr_processes_running = models.IntegerField(default=None,null=True)
     test_results_api_level = models.FloatField(default=None,null=True)
     test_results_android_version = models.CharField(max_length=8, default=None, blank=True, null=True)
-
+    #test_results_device_begin_state= models.ForeignKey(DeviceState, related_name='begin_state', on_delete=models.CASCADE,null=True)
+    #test_results_device_end_state= models.ForeignKey(DeviceState, related_name='end_state', on_delete=models.CASCADE,null=True)
+    #test_init_mem = models.IntegerField(default=None,null=True)
+    #test_init_cpu_free = models.FloatField(default=None,null=True)
+    #test_init_nr_processes_running = models.IntegerField(default=None,null=True)
+    #test_init_api_level = models.FloatField(default=None,null=True)
+    #test_init_android_version = models.FloatField(default=None,null=True)
+    #test_end_mem = models.IntegerField(default=None,null=True)
+    #test_end_cpu_free = models.FloatField(default=None, null=True)
+    #test_end_nr_processes_running = models.IntegerField(default=None,null=True)
+    
 
 class MethodInvoked(models.Model):
     class Meta:

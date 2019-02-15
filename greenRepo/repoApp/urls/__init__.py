@@ -1,6 +1,7 @@
 from django.urls import path, include
 from repoApp.views.populate import PopulateView, PopulateDummyTest, PopulationReset
 from repoApp.views.appRelated import ImportListView
+from repoApp.views.views import AllMetricsListView
 
 urlpatterns = [
 	path('projects/', include('repoApp.urls.projects')),
@@ -14,4 +15,5 @@ urlpatterns = [
     path('populate/', PopulateView.as_view(), name='populate'),
     path('populateTest/', PopulateDummyTest.as_view(), name='pop'),
     path('imports/', ImportListView.as_view(), name='imports'),
+    path('metrics/', AllMetricsListView.as_view(), name='metrics'),
 ]

@@ -178,11 +178,70 @@ class PopulationReset(APIView):
             #Profiler.objects.all().delete()
             pv = PopulateView()
             pv.post(request)
+            ptm = PopulateTestMetrics()
+            pv.post(request)
         except Exception as e:
             print (e)
 
         return Response("DB reseted", HTTP_200_OK)
 
+
+
+
+class PopulateTestMetrics(object):
+    """docstring for PopulateTestMetrics"""
+    permission_classes = [AllowAny]
+    def post(self, request):
+        try:
+            a = Metric()
+            a.metric_name="test_init_mem"
+            a.metric_type='s'
+            a.metric_category='a'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="test_init_cpu_free"
+            a.metric_type='s'
+            a.metric_category='a'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="test_init_nr_processes_running"
+            a.metric_type='s'
+            a.metric_category='a'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="test_end_mem"
+            a.metric_type='s'
+            a.metric_category='a'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="test_end_cpu_free"
+            a.metric_type='s'
+            a.metric_category='a'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="test_end_nr_processes_running"
+            a.metric_type='s'
+            a.metric_category='a'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        return Response("nice", HTTP_200_OK)
 
 
 class PopulateView(APIView):
@@ -212,6 +271,7 @@ class PopulateView(APIView):
             a.save()
         except Exception as e:
             print(e)
+        
         try:
             a = Metric()
             a.metric_name="WifiState"
@@ -236,6 +296,8 @@ class PopulateView(APIView):
             a.save()
         except Exception as e:
             print(e)
+    
+
         try:
             a = Metric()
             a.metric_name="BatteryStatus"
@@ -271,6 +333,22 @@ class PopulateView(APIView):
         try:
             a = Metric()
             a.metric_name="GpuFrequency"
+            a.metric_category='m'
+            a.metric_type='d'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="AvgGpuFrequency"
+            a.metric_category='m'
+            a.metric_type='d'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="TopGpuFrequency"
             a.metric_category='m'
             a.metric_type='d'
             a.save()
@@ -420,6 +498,163 @@ class PopulateView(APIView):
             a.save()
         except Exception as e:
             print(e)
+        try:
+            a = Metric()
+            a.metric_name="CPULoad1"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPULoad2"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPULoad3"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPULoad4"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPULoad5"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPULoad6"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPULoad7"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPULoad8"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+
+
+        try:
+            a = Metric()
+            a.metric_name="CPUFrequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Metric()
+            a.metric_name="CPU1Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPU2Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPU3Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPU4Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPU5Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPU6Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPU7Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+        try:
+            a = Metric()
+            a.metric_name="CPU8Frequency"
+            a.metric_type='d'
+            a.metric_category='m'
+            a.save()
+        except Exception as e:
+            print(e)
+
+
+
+
 
         try:
             a = Metric()

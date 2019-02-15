@@ -4,6 +4,9 @@ from django.utils.timezone import now
 from repoApp.models.appRelated import Application , Method, Class
 from repoApp.models.testRelated import TestResults , MethodInvoked
 
+ 
+
+
 class Study(models.Model):
     study_title = models.CharField(max_length=128,primary_key=True)
     study_authors = models.CharField(max_length=128)
@@ -21,6 +24,7 @@ class MetricType(Enum):
     DYNAMIC = 'd'
     HYBRID = 'h'
 
+
 class MetricCategory(Enum):
     API = 'a'
     PATTERN = 'p'
@@ -28,10 +32,12 @@ class MetricCategory(Enum):
     MEASURABLE = 'm'
     OTHER = 'o'
 
+
+
 class Metric(models.Model):
     metric_name = models.CharField(max_length=32,primary_key=True)
-    metric_type = EnumField(MetricType, max_length=1)
-    metric_category = EnumField(MetricCategory, max_length=1,default='o')
+    metric_type = models.CharField(max_length=1,choices=[(tag, tag.value) for tag in MetricType])
+    metric_category = models.CharField(max_length=1,choices=[(tag, tag.value) for tag in MetricCategory])
     metric_related_study = models.ForeignKey(Study, related_name='accordingto', on_delete=models.CASCADE,default=None,null=True)
     def save(self, *args, **kwargs):
         self.metric_name = self.metric_name.lower()
