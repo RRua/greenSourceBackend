@@ -21,3 +21,23 @@ class AllMetricsListView(APIView):
 	            results=results.filter(metric_type=query['metric_type'][0])
 	        serialize = MetricSerializer(results, many=True)
 	        return Response(serialize.data, HTTP_200_OK)
+
+	data = JSONParser().parse(request) 
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = MetricSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=True):
+                        instance.save()
+                except Exception as e:
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = MetricSerializer(data=data, many=False, partial=True)
+            try:
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+            except Exception as e:
+                pass
+            return Response(instance.data, HTTP_200_OK)
+        return Response(instance.data, HTTP_200_OK)

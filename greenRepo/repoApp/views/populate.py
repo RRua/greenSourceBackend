@@ -174,12 +174,13 @@ class PopulationReset(APIView):
             Application.objects.all().delete()
             AndroidProject.objects.all().delete()
             Metric.objects.all().delete()
+            Application.objects.all().delete()
             #TestOrientation.objects.all().delete()
             #Profiler.objects.all().delete()
             pv = PopulateView()
             pv.post(request)
             ptm = PopulateTestMetrics()
-            pv.post(request)
+            ptm.post(request)
         except Exception as e:
             print (e)
 
@@ -187,59 +188,29 @@ class PopulationReset(APIView):
 
 
 
+def saveMetric(name, tipo, category):
+    # type = static(s), dynamic(d), hybrid (h)
+    #API = 'a' , PATTERN = 'p ,HARDWARE = 'h' , MEASURABLE = 'm' ,OTHER = 'o'
+    try:
+        a = Metric()
+        a.metric_name=name
+        a.metric_type=tipo
+        a.metric_category=category
+        a.save()
+    except Exception as e:
+        print(e)
+
 
 class PopulateTestMetrics(object):
     """docstring for PopulateTestMetrics"""
     permission_classes = [AllowAny]
     def post(self, request):
-        try:
-            a = Metric()
-            a.metric_name="test_init_mem"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="test_init_cpu_free"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="test_init_nr_processes_running"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="test_end_mem"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="test_end_cpu_free"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="test_end_nr_processes_running"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
+        saveMetric("test_init_mem",'d','m')
+        saveMetric("test_init_cpu_free",'d','m')
+        saveMetric("test_init_nr_processes_running",'d','m')
+        saveMetric("test_end_mem",'d','m')
+        saveMetric("test_end_cpu_free",'d','m')
+        saveMetric("test_end_nr_processes_running",'d','m')
 
         return Response("nice", HTTP_200_OK)
 
@@ -247,497 +218,100 @@ class PopulateTestMetrics(object):
 class PopulateView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        try:
-            a = Metric()
-            a.metric_name="externalAPI"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="androidAPI"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="javaAPI"
-            a.metric_type='s'
-            a.metric_category='a'
-            a.save()
-        except Exception as e:
-            print(e)
+        saveMetric("externalAPI",'s','a')
+        saveMetric("androidAPI",'s','a')
+        saveMetric("javaAPI",'s','a')
+        saveMetric("unknownapi",'s','a')
         
-        try:
-            a = Metric()
-            a.metric_name="WifiState"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="MobileDataState"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="ScreenState"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
+        saveMetric("WifiState",'d','h')
+        saveMetric("MobileDataState",'s','a')
+        saveMetric("ScreenState",'d','h')
+        saveMetric("BatteryStatus",'d','h')
+        saveMetric("BatteryCharging",'d','h')
+        saveMetric("nr_methods",'s','o')
+        saveMetric("WifiRSSILevel",'d','h')
+        saveMetric("BluetoothState",'d','h')
+        saveMetric("GpuLoad",'d','h')
+        saveMetric("AvgGpuLoad",'d','h')
+        saveMetric("TopGpuLoad",'d','h')
+        saveMetric("CpuLoadNormalized",'d','h')
+        saveMetric("avgCpuLoadNormalized",'d','h')
+        saveMetric("topCpuLoadNormalized",'d','h')
+        saveMetric("GpsState",'d','h')
+        saveMetric("TotalTime",'d','m')
+        saveMetric("Time",'d','m')
+        saveMetric("TotalEnergy",'d','m')
+        #saveMetric("TotalConsumption",'d','m')
+        saveMetric("enegy",'d','m')
+        saveMetric("TotalCoverage",'d','m')
+        saveMetric("coverage",'d','m')
+        saveMetric("cc",'s','o')
+        saveMetric("LoC",'s','o')
+        saveMetric("NrArgs",'s','o')
+        saveMetric("isStatic",'s','o')
+        #cpuX
+        saveMetric("CPULoad",'d','h')
+        saveMetric("topCPULoad",'d','h')
+        saveMetric("avgCPULoad",'d','h')
+        saveMetric("CPU1Load",'d','h')
+        saveMetric("top1CPULoad",'d','h')
+        saveMetric("avg1CPULoad",'d','h')
+        saveMetric("CPU2Load",'d','h')
+        saveMetric("top2CPULoad",'d','h')
+        saveMetric("avg2CPULoad",'d','h')
+        saveMetric("CPU3Load",'d','h')
+        saveMetric("top3CPULoad",'d','h')
+        saveMetric("avg3CPULoad",'d','h')
+        saveMetric("CPU4Load",'d','h')
+        saveMetric("top4CPULoad",'d','h')
+        saveMetric("avg4CPULoad",'d','h')
+        saveMetric("CPU5Load",'d','h')
+        saveMetric("top5CPULoad",'d','h')
+        saveMetric("avg5CPULoad",'d','h')
+        saveMetric("CPU6Load",'d','h')
+        saveMetric("top6CPULoad",'d','h')
+        saveMetric("avg6CPULoad",'d','h')
+        saveMetric("CPU7Load",'d','h')
+        saveMetric("top7CPULoad",'d','h')
+        saveMetric("avg7CPULoad",'d','h')
+        saveMetric("CPU8Load",'d','h')
+        saveMetric("top8CPULoad",'d','h')
+        saveMetric("avg8CPULoad",'d','h')
     
+        saveMetric("CPUFrequency",'d','h')
+        saveMetric("topCPUFrequency",'d','h')
+        saveMetric("avgCPUFrequency",'d','h')
+        saveMetric("CPU1Frequency",'d','h')
+        saveMetric("top1CPUFrequency",'d','h')
+        saveMetric("avg1CPUFrequency",'d','h')
+        saveMetric("CPU2Frequency",'d','h')
+        saveMetric("top2CPUFrequency",'d','h')
+        saveMetric("avg2CPUFrequency",'d','h')
+        saveMetric("CPU3Frequency",'d','h')
+        saveMetric("top3CPUFrequency",'d','h')
+        saveMetric("avg3CPUFrequency",'d','h')
+        saveMetric("CPU4Frequency",'d','h')
+        saveMetric("top4CPUFrequency",'d','h')
+        saveMetric("avg4CPUFrequency",'d','h')
+        saveMetric("CPU5Frequency",'d','h')
+        saveMetric("top5CPUFrequency",'d','h')
+        saveMetric("avg5CPUFrequency",'d','h')
+        saveMetric("CPU6Frequency",'d','h')
+        saveMetric("top6CPUFrequency",'d','h')
+        saveMetric("avg6CPUFrequency",'d','h')
+        saveMetric("CPU7Frequency",'d','h')
+        saveMetric("top7CPUFrequency",'d','h')
+        saveMetric("avg7CPUFrequency",'d','h')
+        saveMetric("CPU8Frequency",'d','h')
+        saveMetric("top8CPUFrequency",'d','h')
+        saveMetric("avg8CPUFrequency",'d','h')
 
-        try:
-            a = Metric()
-            a.metric_name="BatteryStatus"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="nr_methods"
-            a.metric_type='s'
-            a.metric_category='o'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="WifiRSSILevel"
-            a.metric_category='h'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="BluetoothState"
-            a.metric_category='h'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="GpuFrequency"
-            a.metric_category='m'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="AvgGpuFrequency"
-            a.metric_category='m'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="TopGpuFrequency"
-            a.metric_category='m'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="CpuLoadNormalized"
-            a.metric_category='m'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="GpsState"
-            a.metric_category='h'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="TotalTime"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="TotalEnergy"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="TotalCoverage"
-            a.metric_category='m'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="Coverage"
-            a.metric_type='h'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="CC"
-            a.metric_category='m'
-            a.metric_type='s'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="LoC"
-            a.metric_type='s'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="NrArgs"
-            a.metric_category='m'
-            a.metric_type='s'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="androidapis"
-            a.metric_category='a'
-            a.metric_type='s'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="JavaApis"
-            a.metric_category='a'
-            a.metric_type='s'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_category='a'
-            a.metric_name="unknownapis"
-            a.metric_type='s'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_category='m'
-            a.metric_name="isStatic"
-            a.metric_type='s'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="energy"
-            a.metric_category='m'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="gpstate"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="MobileDatastate"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="wifistate"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="CPULoad"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="CPULoad1"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
+        saveMetric("GPUFrequency",'d','h')
+        saveMetric("topGPUFrequency",'d','h')
+        saveMetric("avgGPUFrequency",'d','h')
+        saveMetric("TopMemory",'d','h')
+        saveMetric("avgMemory",'d','h')
 
-        try:
-            a = Metric()
-            a.metric_name="CPULoad2"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPULoad3"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPULoad4"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPULoad5"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPULoad6"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPULoad7"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPULoad8"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-
-
-        try:
-            a = Metric()
-            a.metric_name="CPUFrequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="CPU1Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPU2Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPU3Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPU4Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPU5Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPU6Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPU7Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="CPU8Frequency"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-
-
-
-
-        try:
-            a = Metric()
-            a.metric_name="AvgCPULoad"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="MaxCPULoad"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="ScreenState"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="BatteryCharging"
-            a.metric_category='h'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="GPULoad"
-            a.metric_category='m'
-            a.metric_type='d'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="wifiRSSILevel"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="Bluetoothstate"
-            a.metric_type='d'
-            a.metric_category='h'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="MaxMemory"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = Metric()
-            a.metric_name="AvgMemory"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
-
-        try:
-            a = Metric()
-            a.metric_name="time"
-            a.metric_type='d'
-            a.metric_category='m'
-            a.save()
-        except Exception as e:
-            print(e)
         ######## TestOrientation
         try:
             a = TestOrientation()
@@ -836,26 +410,6 @@ class PopulateView(APIView):
         except Exception as e:
             print(e)
         ########### Device
-        try:
-            a = DeviceState()
-            a.device_state_mem=100
-            a.device_state_nr_processes_running=10
-            a.device_state_cpu_free=90
-            a.device_state_api_level=25
-            a.device_state_android_version=7.1
-            a.save()
-        except Exception as e:
-            print(e)
-        try:
-            a = DeviceState()
-            a.device_state_mem=960
-            a.device_state_nr_processes_running=11
-            a.device_state_cpu_free=30
-            a.device_state_api_level=22
-            a.device_state_android_version=6.0
-            a.save()
-        except Exception as e:
-            print(e)
         ######## Permissions
         try:
             a = AppPermission()

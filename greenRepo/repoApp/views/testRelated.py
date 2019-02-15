@@ -145,6 +145,7 @@ class ResultsListView(APIView):
         if isinstance(data,list):
             for item in data:
                 try:
+                    #item['metric']=item['metric'].lower()
                     instance = TestResultsSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
@@ -176,10 +177,12 @@ class TestMetricsListView(APIView):
         if isinstance(data,list):
             for item in data:
                 try:
+                    item['metric']= item['metric'].lower()
                     instance = TestMetricSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
                 except Exception as e:
+                    print(" error in " + str(item))
                     continue
             return Response(data, HTTP_200_OK)
         else:
