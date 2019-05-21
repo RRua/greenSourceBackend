@@ -150,7 +150,7 @@ Povoa a BD com dados dummy para fins de testing.
 [
   {
     "app_id": "dummy_app",
-    "app_location": "/Users/dummyUser/apps/dummyApp",
+    "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
     "app_description": "dumb",
     "app_version": 1.1,
     "app_flavor": "demo",
@@ -166,7 +166,7 @@ Povoa a BD com dados dummy para fins de testing.
 [
   {
     "app_id": "dummy_app",
-    "app_location": "/Users/dummyUser/apps/dummyApp",
+    "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
     "app_description": "dumb",
     "app_version": 1.1,
     "app_flavor": "demo",
@@ -182,7 +182,7 @@ Povoa a BD com dados dummy para fins de testing.
 [
   {
     "app_id": "dummy_app",
-    "app_location": "/Users/dummyUser/apps/dummyApp",
+    "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
     "app_description": "dumb",
     "app_version": 1.1,
     "app_flavor": "demo",
@@ -222,7 +222,7 @@ Povoa a BD com dados dummy para fins de testing.
 [
    {
         "app_id": "dummy_app",
-        "app_location": "/Users/dummyUser/apps/dummyApp",
+        "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
         "app_description": "dumb",
         "app_version": 1.1,
         "app_flavor": "demo",
@@ -248,7 +248,7 @@ Povoa a BD com dados dummy para fins de testing.
 [
    {
         "app_id": "dummy_app",
-        "app_location": "/Users/dummyUser/apps/dummyApp",
+        "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
         "app_description": "dumb",
         "app_version": 1.1,
         "app_flavor": "demo",
@@ -273,7 +273,7 @@ Povoa a BD com dados dummy para fins de testing.
 [
   { {
         "app_id": "dummy_app",
-        "app_location": "/Users/dummyUser/apps/dummyApp",
+        "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
         "app_description": "dumb",
         "app_version": 1.1,
         "app_flavor": "demo",
@@ -306,7 +306,7 @@ Povoa a BD com dados dummy para fins de testing.
 [
   {
     "app_id": "dummy_app",
-    "app_location": "/Users/dummyUser/apps/dummyApp",
+    "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
     "app_description": "dumb",
     "app_version": 1.1,
     "app_flavor": "demo",
