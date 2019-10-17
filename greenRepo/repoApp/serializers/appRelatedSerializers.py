@@ -16,7 +16,7 @@ class AndroidProjectSerializer(serializers.ModelSerializer):
         return obj
     class Meta:
         model = AndroidProject
-        fields = ('project_id', 'project_build_tool', 'project_desc')
+        fields = ('project_id', 'project_build_tool', 'project_desc','project_location')
         validators = []
 
 
@@ -51,7 +51,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         list_serializer_class =ApplicationListSerializer
-        fields = ('app_id', 'app_location', 'app_description','app_version','app_flavor','app_build_type', 'app_project')
+        fields = ('app_id', 'app_package', 'app_description','app_version','app_flavor','app_build_type', 'app_project')
         validators = []
 
 
@@ -93,8 +93,8 @@ class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         list_serializer_class =ClassListSerializer
-        fields = ('class_id', 'class_name', 'class_package', 'class_non_acc_mod',
-            'class_app', 'class_acc_modifier', 'class_superclass', 'class_is_interface' ,'class_implemented_ifaces')
+        fields = ('class_id', 'class_name', 'class_package',
+            'class_app','class_language')
         validators=[]        
 
 #TODO classwithImportsSerializer
@@ -116,8 +116,8 @@ class ClassWithMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         list_serializer_class =ClassListSerializer
-        fields = ('class_id', 'class_name', 'class_package', 'class_non_acc_mod',
-            'class_app', 'class_acc_modifier', 'class_superclass', 'class_is_interface' ,'class_implemented_ifaces')
+        fields = ('class_id', 'class_name', 'class_package',
+            'class_app','class_language')
         validators = []
 
 
@@ -134,7 +134,7 @@ class AppWithMetricsSerializer(serializers.ModelSerializer):
         model = Application
         #list_serializer_class =ClassListSerializer
         list_serializer_class =ApplicationListSerializer
-        fields = ('app_id', 'app_location', 'app_description','app_version','app_flavor','app_build_type', 'app_project')
+        fields = ('app_id' , 'app_description','app_version','app_flavor','app_build_type', 'app_project')
         validators = []
 
 class ClassWithImportsSerializer(serializers.ModelSerializer):
@@ -149,8 +149,8 @@ class ClassWithImportsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         list_serializer_class =ClassWithMetricsSerializer()
-        fields = ('class_id' ,'class_name', 'class_package', 'class_non_acc_mod',
-            'class_app', 'class_acc_modifier', 'class_superclass', 'class_is_interface' ,'class_implemented_ifaces')
+        fields = ('class_id' ,'class_name','class_language', 'class_package',
+            'class_app', 'class_superclass' ,'class_implemented_ifaces')
         validators = []
 
 class AppHasPermissionListSerializer(serializers.ListSerializer):
@@ -206,7 +206,7 @@ class MethodWithMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Method
         list_serializer_class = MethodListSerializer
-        fields = ('method_id', 'method_name','method_acc_modifier', 'method_non_acc_mod','method_class')
+        fields = ('method_id', 'method_name','method_args','method_return','method_modifiers','method_class')
         validators = []
 
 
@@ -214,6 +214,6 @@ class MethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Method
         #list_serializer_class = MethodListSerializer
-        fields = ('method_id', 'method_name', 'method_class','method_acc_modifier', 'method_non_acc_mod')
+        fields = ('method_id', 'method_name','method_args', 'method_return', 'method_class','method_modifiers')
         validators = []
 

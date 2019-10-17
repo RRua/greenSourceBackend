@@ -46,7 +46,7 @@ class TestResultsWithMetricsSerializer(serializers.ModelSerializer):
         model = TestResults
         fields = ('test_results_id', 'test_results_unix_timestamp', 'test_results_seed', 
             'test_results_description', 'test_results_test', 'test_results_profiler',
-            'test_results_device' , 'test_results_api_level','test_results_android_version' ) #'test_init_mem', 'test_init_cpu_free',
+            'test_results_device_state' )#, 'test_results_api_level' ,'test_results_android_version' ) #'test_init_mem', 'test_init_cpu_free',
            # 'test_init_nr_processes_running','test_end_mem', 'test_end_cpu_free',
            # 'test_end_nr_processes_running','test_results_api_level','test_results_android_version')
         validators = []
@@ -57,7 +57,7 @@ class TestResultsSerializer(serializers.ModelSerializer):
         list_serializer_class = TestResultsListSerializer
         fields = ('test_results_id', 'test_results_unix_timestamp', 'test_results_seed', 
             'test_results_description', 'test_results_test', 'test_results_profiler',
-            'test_results_device' , 'test_results_api_level','test_results_android_version' )
+            'test_results_device_state' )
         validators = []
 
 class TestOrientationSerializer(serializers.ModelSerializer):
@@ -85,7 +85,13 @@ class ProfilerSerializer(serializers.ModelSerializer):
 class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
-        fields = ('device_serial_number','device_brand','device_model')
+        fields = ('device_serial_number','device_brand','device_model', 'device_cores','device_ram', 'device_max_cpu_freq')
+        validators = []
+
+class DeviceStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeviceState
+        fields = ('state_id','state_os_version','state_date','state_miui_version', 'state_kernel_version','state_api_version','state_device_id','state_operator','state_operator_country')
         validators = []
 
 #class DeviceStateSerializer(serializers.ModelSerializer):

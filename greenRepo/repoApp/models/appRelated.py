@@ -20,12 +20,12 @@ class AndroidProject(models.Model):
     project_id = models.CharField(max_length=64, primary_key=True)
     project_build_tool=  models.CharField(max_length=16, default="gradle",blank=True)
     project_desc = models.CharField(max_length=64,default="",blank=True)
-
+    project_location= models.CharField(max_length=512)
 
 
 class Application(models.Model):
     app_id = models.CharField(max_length=255,primary_key=True)
-    app_location= models.CharField(max_length=512)
+    #app_location= models.CharField(max_length=512)
     app_package= models.CharField(max_length=128, default="", blank=True,null=True)
     app_description = models.CharField(max_length=64,default="",blank=True, null=True )
     app_version= models.CharField(max_length=8,default="",blank=True , null=True)
@@ -36,14 +36,16 @@ class Application(models.Model):
 class Class(models.Model):
     class_id = models.CharField(primary_key=True,max_length=255)
     class_name = models.CharField(max_length=64)
-    class_package = models.CharField(max_length=32)
-    class_non_acc_mod = models.CharField(max_length=32, default="",blank=True)
+    class_package = models.CharField(max_length=64)
+    class_language = models.CharField(max_length=32,default="java")
     class_app = models.ForeignKey(Application, related_name='belongs_app', on_delete=models.CASCADE)
-    class_acc_modifier = models.CharField(max_length=16, default="",blank=True )
-    class_superclass = models.CharField(max_length=64, default="",blank=True)
-    class_is_interface = models.BooleanField(default=False)
+    #class_superclass = models.CharField(max_length=64, default="",blank=True)
+    #class_non_acc_mod = models.CharField(max_length=32, default="",blank=True)
+    #class_acc_modifier = models.CharField(max_length=16, default="",blank=True )
+    #class_fields =models.CharField(max_length=511, default="",blank=True)
+    #class_is_interface = models.BooleanField(default=False)
     #class_n_vars = models.IntegerField()
-    class_implemented_ifaces = models.CharField(max_length=255,default="",blank=True)
+    #class_implemented_ifaces = models.CharField(max_length=511,default="",blank=True)
 
 class ImportClass(models.Model):
     class Meta:
@@ -61,11 +63,12 @@ class Method(models.Model):
         unique_together = (('method_name', 'method_class','method_id'),)
     method_id = models.CharField(primary_key=True,max_length=255)
     method_name = models.CharField(max_length=255)
+    method_return = models.CharField(max_length= 128, default=None, blank=True,null=True)
     #method_hash_args = models.CharField(max_length=34,default="")
-    method_non_acc_mod = models.CharField(max_length=32,default="",blank=True)
-    method_acc_modifier = models.CharField(max_length=16,default="",blank=True)
+    #method_non_acc_mod = models.CharField(max_length=32,default="",blank=True)
+    method_modifiers = models.CharField(max_length=64, default=None,blank=True, null=True)
     method_class = models.ForeignKey(Class, related_name='classofmethod', on_delete=models.CASCADE, null=True)
-    #method_args = models.CharField(max_length=256, default = None, null=True)
+    method_args = models.CharField(max_length=256, default = None, null=True)
 
 
 

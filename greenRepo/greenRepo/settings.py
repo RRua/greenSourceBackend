@@ -84,15 +84,36 @@ WSGI_APPLICATION = 'greenRepo.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+   # 'default': {
+   #     'ENGINE': 'django.db.backends.postgresql',
+   #     'NAME': 'greenrepo',
+   #     'USER': 'greenlab',
+   #     'PASSWORD': 'greens',
+   #     'HOST': 'localhost',
+   # }
+  # 'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'OPTIONS': {
+#            'read_default_file': './my.cnf',
+#            'init_command': 'SET default_storage_engine=INNODB',
+#        },
+ #   }
+ 'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        #'OPTIONS': {
+        #    'read_default_file': './my.cnf',
+        #    'init_command': 'SET default_storage_engine=INNODB',
+        #},
+        #'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'greenrepo',
         'USER': 'greenlab',
         'PASSWORD': 'greens',
         'HOST': 'localhost',
-    }
+   }
+
 }
 
+# gsource
 #DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.mysql',
@@ -139,10 +160,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = '/static/'
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_URL = '/staticfiles/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 # Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
+#import django_heroku
+#django_heroku.settings(locals())
 
 

@@ -48,42 +48,45 @@ class TestMetric(models.Model):
         unique_together = (('test_results', 'metric'),)
     test_results = models.ForeignKey(TestResults, related_name='res', on_delete=models.CASCADE)
     metric = models.ForeignKey(Metric, related_name='metric', on_delete=models.CASCADE)
-    value = models.FloatField()
-    value_text = models.CharField(max_length=32, default="")
-    coeficient = models.IntegerField(default=1)
-    timestamp = models.DateTimeField(default=now)
+    #value = models.FloatField()
+    value_text = models.CharField(max_length=384, default="")
+    coeficient = models.CharField(max_length=16,default="",blank=True , null=True)
+    #timestamp = models.DateTimeField(default=now)
 
 
 class AppMetric(models.Model):
     class Meta:
-        unique_together = (('am_app', 'am_metric','am_timestamp'),)
+        unique_together = (('am_app', 'am_metric','am_value_text'),)
     am_app = models.ForeignKey(Application, related_name='aapp', on_delete=models.CASCADE)
     am_metric = models.ForeignKey(Metric, related_name='ahasMetric', on_delete=models.CASCADE)
-    am_value = models.FloatField()
-    am_value_text = models.CharField(max_length=32, default="")
-    am_coeficient = models.IntegerField(default=1)
-    am_timestamp = models.DateTimeField(default=now)
+    #am_value = models.FloatField()
+    am_value_text = models.CharField(max_length=384, default="")
+    am_coeficient = models.CharField(max_length=16,default="",blank=True , null=True)  
+    am_test_result = models.ForeignKey(TestResults, related_name='ammtest', on_delete=models.CASCADE,default=None,null=True)
+
 
 class ClassMetric(models.Model):
     class Meta:
-        unique_together = (('cm_class', 'cm_metric','cm_timestamp'),)
+        unique_together = (('cm_class', 'cm_metric','cm_value_text'),)
     cm_class = models.ForeignKey(Class, related_name='classmetric', on_delete=models.CASCADE)
     cm_metric = models.ForeignKey(Metric, related_name='chasMetric', on_delete=models.CASCADE)
-    cm_value = models.FloatField()
-    cm_value_text = models.CharField(max_length=32,default="")
-    cm_coeficient = models.IntegerField(default=1)
-    cm_timestamp = models.DateTimeField( default=now)
+    #cm_value = models.FloatField()
+    cm_value_text = models.CharField(max_length=512,default="")
+    cm_coeficient = models.CharField(max_length=16,default="",blank=True , null=True)
+    #cm_timestamp = models.DateTimeField( default=now)
+    cm_test_result = models.ForeignKey(TestResults, related_name='cmmtest', on_delete=models.CASCADE,default=None,null=True)
+
 
 class MethodMetric(models.Model):
     class Meta:
-        unique_together = (('mm_method', 'mm_metric','mm_timestamp'),)
+        unique_together = (('mm_method', 'mm_metric','mm_value_text'),)
     mm_method = models.ForeignKey(Method, related_name='mmmethod', on_delete=models.CASCADE)
     mm_metric = models.ForeignKey(Metric, related_name='mmmethodHasMetric', on_delete=models.CASCADE)
-    mm_value = models.FloatField()
-    mm_value_text = models.CharField(max_length=32, default="")
-    mm_coeficient = models.IntegerField(default=1)
-    mm_timestamp = models.DateTimeField(default=now)
-    mm_test = models.ForeignKey(TestResults, related_name='mmmtest', on_delete=models.CASCADE,default=None,null=True)
+    #mm_value = models.FloatField()
+    mm_value_text = models.CharField(max_length=384, default="")
+    mm_coeficient = models.CharField(max_length=16,default="",blank=True , null=True)
+    #mm_timestamp = models.DateTimeField(default=now)
+    mm_test_result = models.ForeignKey(TestResults, related_name='mmmtest', on_delete=models.CASCADE,default=None,null=True)
 
 
     #mm_method_invoked = models.ForeignKey(MethodInvoked, related_name='mmmethodHasMetric', on_delete=models.CASCADE,default=None,null=True)

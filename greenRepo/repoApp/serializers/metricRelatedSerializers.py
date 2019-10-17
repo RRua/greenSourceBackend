@@ -23,7 +23,7 @@ class TestMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestMetric
         list_serializer_class = TestMetricListSerializer
-        fields = ('test_results', 'metric', 'value', 'value_text', 'coeficient')
+        fields = ('test_results', 'metric', 'value_text', 'coeficient')
 
 class StudySerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,14 +34,14 @@ class StudySerializer(serializers.ModelSerializer):
 class AppMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppMetric
-        fields = ('am_app', 'am_metric','am_value','am_value_text','am_coeficient','am_timestamp')
+        fields = ('am_app', 'am_metric', 'am_value_text','am_coeficient','am_test_result')
 
 
 
 class ClassMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassMetric
-        fields = ('cm_class','cm_timestamp', 'cm_metric','cm_value','cm_coeficient','cm_value_text')
+        fields = ('cm_class','cm_test_result' , 'cm_metric','cm_coeficient','cm_value_text')
         validators = []
 
 
@@ -59,6 +59,6 @@ class MethodMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = MethodMetric
         list_serializer_class = MethodMetricListSerializer
-        fields = ('mm_method', 'mm_metric','mm_value', 'mm_coeficient','mm_test')
+        fields = ('mm_method', 'mm_metric','mm_value_text', 'mm_coeficient','mm_test_result')
         validators = []
         

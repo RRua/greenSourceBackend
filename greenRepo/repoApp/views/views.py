@@ -42,3 +42,7 @@ class AllMetricsListView(APIView):
                 pass
             return Response(instance.data, HTTP_200_OK)
         return Response(instance.data, HTTP_200_OK)
+
+
+def listSplitter(args, delimiter=","):
+    return args.split(delimiter)

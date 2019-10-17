@@ -2,12 +2,14 @@ from django.urls import path, include
 from repoApp.views.populate import PopulateView, PopulateDummyTest, PopulationReset
 from repoApp.views.appRelated import ImportListView
 from repoApp.views.views import AllMetricsListView
+from repoApp.views.devices import DeviceStateView
 
 urlpatterns = [
 	path('projects/', include('repoApp.urls.projects')),
     path('results/', include('repoApp.urls.results')),
     path('tests/', include('repoApp.urls.tests')),
     path('devices/', include('repoApp.urls.devices')),
+    path('devicestate/', DeviceStateView.as_view(), name='devstate'),
     path('apps/', include('repoApp.urls.apps')),
     path('methods/', include('repoApp.urls.methods')),
     path('classes/', include('repoApp.urls.classes')),

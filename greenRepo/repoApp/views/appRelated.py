@@ -7,8 +7,11 @@ from urllib.parse import parse_qs
 from repoApp.models.testRelated import *
 from repoApp.models.appRelated import *
 from repoApp.models.metricsRelated import *
+from repoApp.views.views import *
+
 # from time import gmtime, strftime
 from django.db import IntegrityError
+from django.db.models import Q , Count
 from django.core.exceptions import ValidationError
 import datetime
 from repoApp.serializers.testRelatedSerializers import *
@@ -73,6 +76,12 @@ class AppsListView(APIView):
             results=results.filter(app_version=query['app_version'][0])
         if 'app_flavor' in query:
             results=results.filter(app_flavor=query['app_flavor'][0])
+        if 'app_permission' in query:
+            q_objects = Q()
+            for item in query['app_permission']:
+                q_objects.add(Q(permission_id=item), Q.OR)
+            res_perms=AppHasPermission.objects.filter(q_objects).values('application_id').annotate(Count("permission_id")).filter(permission_id__count=len(query['app_permission']))
+            results=results.filter(app_id__in=res_perms.values('application_id'))
         if 'app_project' in query:
             try:
                 proj = AndroidProject.objects.get(project_id=query['app_project'][0])
@@ -221,7 +230,7 @@ class AppsMethodsDetailView(APIView):
         query=parse_qs(request.META['QUERY_STRING'])
         classes = Class.objects.filter(class_app=appid)
         results = Method.objects.filter(method_class__in=classes.values('class_id'))
-        results = results.filter(method_name=methodid)
+        results = results.filter(method_id=methodid)
         if 'method_id' in query:
             results=results.filter(method_id=query['method_id'][0])
         serialize = MethodWithMetricsSerializer(results, many=True)
@@ -275,9 +284,12 @@ class MethodsListView(APIView):
             for item in data:
                 try:
                     instance = MethodSerializer(data=item, many=False, partial=True)
-                    if instance.is_valid(raise_exception=False):
+                    if instance.is_valid(raise_exception=True):
                         instance.save()
-                except Exception as e:
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
@@ -448,20 +460,23 @@ class MethodInvokedListView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
-        if serializer.is_valid(raise_exception=False):
-            if isinstance(data,list):
-                for item in data:
-                    try:
-                        instance = MethodInvokedSerializer(data=item, many=False, partial=True)
-                        if instance.is_valid(raise_exception=False):
-                            instance.save()
-                        #serializer = TestSerializer(instance, many=isinstance(data,list))
-                    except Exception as e:
-                        continue
-            return Response(serializer.data, HTTP_200_OK)
-        else:
+        try:
+            if serializer.is_valid(raise_exception=True):
+                if isinstance(data,list):
+                    for item in data:
+                        try:
+                            instance = MethodInvokedSerializer(data=item, many=False, partial=True)
+                            if instance.is_valid(raise_exception=True):
+                                instance.save()
+                            #serializer = TestSerializer(instance, many=isinstance(data,list))
+                        except Exception as e:
+                            print(e)
+                return Response(serializer.data, HTTP_200_OK)
+            else:
+                return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
             return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
-
 
 # /classes/
 class ClassesListView(APIView):
@@ -490,7 +505,35 @@ class ClassesListView(APIView):
         if isinstance(data,list):
             for item in data:
                 try:
-                    instance = ClassWithImportsSerializer(data=item, many=False, partial=True)
+                    instance = ClassSerializer(data=item, many=False, partial=True)
+                    if instance.is_valid(raise_exception=True):
+                        instance.save()
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
+                    continue
+            return Response(data, HTTP_200_OK)
+        else:
+            instance = ClassSerializer(data=data, many=False, partial=True)
+            try:
+                if instance.is_valid(raise_exception=True):
+                    instance.save()
+            except Exception as e:
+                pass
+            return Response(instance.data, HTTP_200_OK)
+        return Response(instance.data, HTTP_200_OK)
+
+
+
+
+class AppHasPermissionListView(APIView):
+    def post(self, request):
+        data = JSONParser().parse(request)
+        if isinstance(data,list):
+            for item in data:
+                try:
+                    instance = AppHasPermissionSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
                 except Exception as e:
@@ -498,31 +541,12 @@ class ClassesListView(APIView):
                     continue
             return Response(data, HTTP_200_OK)
         else:
-            instance = ClassWithImportsSerializer(data=data, many=False, partial=True)
+            instance = AppHasPermissionSerializer(data=data, many=False, partial=True)
             if instance.is_valid(raise_exception=True):
                 instance.save()
                 return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_200_OK)
 
-
-
-class AppHasPermissionListView(APIView):
-    def post(self, request):
-        data = JSONParser().parse(request)
-        serializer = AppHasPermissionSerializer(data=data, many=isinstance(data,list), partial=True)
-        if serializer.is_valid(raise_exception=True):
-            if isinstance(data,list):
-                for item in data:
-                    try:
-                        instance = AppHasPermissionSerializer(data=item, many=False, partial=True)
-                        if instance.is_valid(raise_exception=True):
-                            instance.save()
-                        #serializer = TestSerializer(instance, many=isinstance(data,list))
-                    except IntegrityError as e:
-                        continue
-            return Response(serializer.data, HTTP_200_OK)
-        else:
-            return Response('Internal error or malformed JSON ', HTTP_200_OK)
 
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])

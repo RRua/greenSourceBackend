@@ -183,6 +183,7 @@ class TestMetricsListView(APIView):
                         instance.save()
                 except Exception as e:
                     print(" error in " + str(item))
+                    print(e)
                     continue
             return Response(data, HTTP_200_OK)
         else:

@@ -37,22 +37,32 @@ class Profiler(models.Model):
 #m = Profiler.objects.filter(profiler_type=ProfilerType.HARDWARE_BASED)
 
 class Device(models.Model):
-    device_serial_number = models.CharField(max_length=20,primary_key=True)
-    device_brand = models.CharField(max_length=20)
-    device_model = models.CharField(max_length=20)
+    device_serial_number = models.CharField(max_length=32,primary_key=True)
+    device_brand = models.CharField(max_length=32)
+    device_model = models.CharField(max_length=32)
+    device_ram = models.CharField(max_length=16,default=None,null=True)
+    device_cores = models.IntegerField(default=1)
+    device_max_cpu_freq = models.CharField(max_length=8)
     def save(self, *args, **kwargs):
         self.device_brand = self.device_brand.lower().replace(" ", "")
         self.device_model = self.device_model.lower().replace(" ", "")
         return super(Device, self).save(*args, **kwargs)
 
-#class DeviceState(models.Model):
-#    device_state_id = models.AutoField(primary_key=True)
-#    device_state_mem = models.IntegerField()
-#    device_state_cpu_free = models.IntegerField()
-#    device_state_nr_processes_running = models.IntegerField()
-#    device_state_api_level = models.IntegerField()
-#    device_state_android_version = models.FloatField()
 
+
+class DeviceState(models.Model):
+    class Meta:
+        unique_together = (('state_device_id','state_kernel_version'),)
+    state_id = models.AutoField(primary_key=True)
+    state_date = models.DateTimeField(default=now)
+    state_kernel_version = models.CharField(max_length=224,default=None, null=True)
+    state_os_version = models.CharField(max_length=16,default=None, null=True)
+    state_miui_version = models.CharField(max_length=16, default=None,null=True)
+    state_api_version  = models.FloatField(default=None,null=True)
+    #state_keyboard = models.CharField(max_length=128,default=None, null=True)
+    state_operator = models.CharField(max_length=128,default=None, null=True)
+    state_operator_country = models.CharField(max_length=16,default="PT", null=True)
+    state_device_id  = models.ForeignKey(Device, related_name='stateOf', on_delete=models.CASCADE)
 
 class Test(models.Model):
     class Meta:
@@ -66,23 +76,12 @@ class TestResults(models.Model):
     test_results_id = models.AutoField(primary_key=True)
     test_results_unix_timestamp = models.IntegerField(default=1, unique=True)
     test_results_seed = models.CharField(max_length=32, default="", blank=True, null=True)
-    test_results_description = models.CharField(max_length=100, default="", blank=True, null=True)
+    test_results_description = models.CharField(max_length=128, default="", blank=True, null=True)
     test_results_test= models.ForeignKey(Test, related_name='test', on_delete=models.CASCADE)
     test_results_profiler= models.ForeignKey(Profiler, related_name='profiledOn', on_delete=models.CASCADE)
-    test_results_device= models.ForeignKey(Device, related_name='testedOn', on_delete=models.CASCADE)
-    test_results_api_level = models.FloatField(default=None,null=True)
-    test_results_android_version = models.CharField(max_length=8, default=None, blank=True, null=True)
-    #test_results_device_begin_state= models.ForeignKey(DeviceState, related_name='begin_state', on_delete=models.CASCADE,null=True)
-    #test_results_device_end_state= models.ForeignKey(DeviceState, related_name='end_state', on_delete=models.CASCADE,null=True)
-    #test_init_mem = models.IntegerField(default=None,null=True)
-    #test_init_cpu_free = models.FloatField(default=None,null=True)
-    #test_init_nr_processes_running = models.IntegerField(default=None,null=True)
-    #test_init_api_level = models.FloatField(default=None,null=True)
-    #test_init_android_version = models.FloatField(default=None,null=True)
-    #test_end_mem = models.IntegerField(default=None,null=True)
-    #test_end_cpu_free = models.FloatField(default=None, null=True)
-    #test_end_nr_processes_running = models.IntegerField(default=None,null=True)
-    
+    test_results_device_state= models.ForeignKey(DeviceState, related_name='testedOn', on_delete=models.CASCADE)
+    #test_results_android_version = models.CharField(max_length=8, default=None, blank=True, null=True)
+   
 
 class MethodInvoked(models.Model):
     class Meta:

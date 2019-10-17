@@ -141,6 +141,7 @@ Povoa a BD com dados dummy para fins de testing.
 #### Query Parameters
 - *app_id*: filter by  ``app_id``
 - *app_description*: filter if contains``app_description``
+- *app_permission*: filter apps that contains``app_permission``
 - *app_flavor*: filter by   ``app_flavor`` (demo | full)
 - *app_build_type*: filter by ``app_build_type`` (debug|release)
 - *app_project*: filter by   ``app_project`` (demo | full)
