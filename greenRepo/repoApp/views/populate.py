@@ -184,7 +184,7 @@ class PopulationReset(APIView):
             pv = PopulateView()
             pv.post(request)
             #ptm = PopulateTestMetrics()
-            ptm.post(request)
+            #ptm.post(request)
         except Exception as e:
             print ("Error deleting previous models")
             print(e)
@@ -323,7 +323,7 @@ class PopulateView(APIView):
             print(e)
         try:
             a = Tool()
-            a.tool_name="unittests"
+            a.tool_name="monkeyrunner"
             a.save()
         except Exception as e:
             print(e)
