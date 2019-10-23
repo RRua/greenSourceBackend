@@ -11,6 +11,13 @@ import datetime
 from repoApp.serializers.testRelatedSerializers import *
 from repoApp.serializers.appRelatedSerializers import MethodSerializer
 from repoApp.serializers.metricRelatedSerializers import MethodMetricSerializer, TestMetricSerializer
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from repoApp.models.models import TokenModel
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 class TestsListView(APIView):
     def get(self, request):
@@ -31,6 +38,7 @@ class TestsListView(APIView):
         serialize = TestSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -85,7 +93,7 @@ class ResultsTestListView(APIView):
         serializer = TestResultsWithMetricsSerializer(results, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
-
+    @method_decorator(login_required)
     def post(self, request,testid):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -139,6 +147,7 @@ class ResultsListView(APIView):
         serializer = TestResultsSerializer(results, many=True)
         return Response(serializer.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = MethodMetricSerializer(data=data,many=isinstance(data, list), partial=True)
@@ -159,6 +168,7 @@ class ResultsListView(APIView):
                 Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_200_OK)
 
+# test/metrics/
 class TestMetricsListView(APIView):
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -172,6 +182,7 @@ class TestMetricsListView(APIView):
         serialize = TestMetricSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -199,6 +210,7 @@ class TestMetricsListView(APIView):
 
 
 class TestResultsListView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         #print(data)

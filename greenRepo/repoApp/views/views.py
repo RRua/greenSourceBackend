@@ -7,8 +7,15 @@ from urllib.parse import parse_qs
 from rest_framework.views import APIView
 from repoApp.models.metricsRelated import Metric
 from repoApp.serializers.metricRelatedSerializers import MetricSerializer
+from django.contrib.auth.decorators import login_required
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from repoApp.models.models import TokenModel
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
-# Create your views here.
+
 class AllMetricsListView(APIView):
     def get(self, request):
             query=parse_qs(request.META['QUERY_STRING'])
@@ -22,6 +29,7 @@ class AllMetricsListView(APIView):
             serialize = MetricSerializer(results, many=True)
             return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):        
         data = JSONParser().parse(request) 
         if isinstance(data,list):

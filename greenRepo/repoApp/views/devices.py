@@ -9,6 +9,9 @@ from repoApp.models.testRelated import *
 from django.db import IntegrityError
 import datetime
 from repoApp.serializers.testRelatedSerializers import *
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 class DevicesListView(APIView):
     #'device_serial_number','device_brand','device_model'
@@ -27,6 +30,7 @@ class DevicesListView(APIView):
         serialize = DeviceSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -66,6 +70,7 @@ class DeviceStateView(APIView):
         serialize = DeviceStateSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):

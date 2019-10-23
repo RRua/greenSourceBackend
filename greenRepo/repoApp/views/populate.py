@@ -9,10 +9,16 @@ from repoApp.models.metricsRelated import *
 from repoApp.models.testRelated import *
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib.staticfiles.storage import staticfiles_storage
-
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from repoApp.models.models import TokenModel
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 class PopulateDummyTest(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    @method_decorator(login_required)
     def post(self, request):
         try:
             a = AndroidProject()
@@ -160,7 +166,9 @@ class PopulateDummyTest(APIView):
 
 
 class PopulationReset(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
+    @method_decorator(login_required)
     def post(self, request):
         try:
             AppMetric.objects.all().delete()
@@ -209,7 +217,9 @@ def saveMetric(name, tipo, category):
 
 
 class PopulateView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
+    @method_decorator(login_required)
     def post(self, request):
         # method metrics
         saveMetric("api", 's', 'a')

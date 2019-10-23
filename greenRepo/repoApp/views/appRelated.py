@@ -17,7 +17,8 @@ import datetime
 from repoApp.serializers.testRelatedSerializers import *
 from repoApp.serializers.appRelatedSerializers import *
 from repoApp.serializers.metricRelatedSerializers import *
-
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 
 class ProjectView(APIView):
@@ -27,6 +28,7 @@ class ProjectView(APIView):
         serialize = AndroidProjectWithAppsSerializer(results, many=False)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def put(self, request,projid):
         return Response('Not implemented ', HTTP_404_NOT_FOUND)
 
@@ -42,6 +44,7 @@ class ProjectListView(APIView):
         serialize = AndroidProjectSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -92,6 +95,7 @@ class AppsListView(APIView):
         return Response(serialize.data, HTTP_200_OK)
 
     #adiciona apps mesmo tendo no meio apps que ja existam
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -178,6 +182,7 @@ class AppsClassListView(APIView):
         serialize = ClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request,appid):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -207,7 +212,7 @@ class ResultsTestListView(APIView):
         serializer = TestResultsFullSerializer(res, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
-
+    @method_decorator(login_required)
     def post(self, request):
         return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
 
@@ -278,6 +283,7 @@ class MethodsListView(APIView):
             serialize = MethodWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
     
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -314,6 +320,7 @@ class MethodMetricsView(APIView):
         serialize = MethodWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -370,6 +377,7 @@ class AppsMetricsView(APIView):
         serialize = AppWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -424,6 +432,7 @@ class ClassMetricsView(APIView):
         serialize = ClassWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -457,6 +466,7 @@ class MethodInvokedListView(APIView):
         serialize = MethodInvokedSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
@@ -500,6 +510,7 @@ class ClassesListView(APIView):
         serialize = ClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -528,6 +539,7 @@ class ClassesListView(APIView):
 
 
 class AppHasPermissionListView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -569,6 +581,7 @@ class ImportListView(APIView):
         serialize = ImportClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
+    @method_decorator(login_required)
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = ImportClassSerializer(data=data, many=isinstance(data,list), partial=True)
@@ -586,7 +599,6 @@ class ImportListView(APIView):
             return Response('Internal error or malformed JSON ', HTTP_200_OK)
 
     
-
 
 
 
