@@ -14,9 +14,10 @@ from repoApp.models.models import TokenModel
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
+from django.contrib.admin.views.decorators import staff_member_required
 
 class AllMetricsListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
             query=parse_qs(request.META['QUERY_STRING'])
             results = Metric.objects.all()
@@ -29,7 +30,7 @@ class AllMetricsListView(APIView):
             serialize = MetricSerializer(results, many=True)
             return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):        
         data = JSONParser().parse(request) 
         if isinstance(data,list):

@@ -11,10 +11,11 @@ import datetime
 from repoApp.serializers.testRelatedSerializers import *
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
+from django.contrib.admin.views.decorators import staff_member_required
 
 class DevicesListView(APIView):
     #'device_serial_number','device_brand','device_model'
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Device.objects.all()
@@ -30,7 +31,7 @@ class DevicesListView(APIView):
         serialize = DeviceSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -55,6 +56,7 @@ class DevicesListView(APIView):
 
 class DeviceStateView(APIView):
     #'device_serial_number','device_brand','device_model'
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = DeviceState.objects.all()
@@ -70,7 +72,7 @@ class DeviceStateView(APIView):
         serialize = DeviceStateSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):

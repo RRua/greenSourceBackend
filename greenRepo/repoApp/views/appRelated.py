@@ -8,8 +8,6 @@ from repoApp.models.testRelated import *
 from repoApp.models.appRelated import *
 from repoApp.models.metricsRelated import *
 from repoApp.views.views import *
-
-# from time import gmtime, strftime
 from django.db import IntegrityError
 from django.db.models import Q , Count
 from django.core.exceptions import ValidationError
@@ -19,21 +17,23 @@ from repoApp.serializers.appRelatedSerializers import *
 from repoApp.serializers.metricRelatedSerializers import *
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
+from django.contrib.admin.views.decorators import staff_member_required
 
 class ProjectView(APIView):
+    @method_decorator(login_required)
     def get(self, request,projid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = AndroidProject.objects.get(project_id=projid)
         serialize = AndroidProjectWithAppsSerializer(results, many=False)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def put(self, request,projid):
         return Response('Not implemented ', HTTP_404_NOT_FOUND)
 
 
 class ProjectListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = AndroidProject.objects.all()
@@ -44,7 +44,7 @@ class ProjectListView(APIView):
         serialize = AndroidProjectSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -68,6 +68,7 @@ class ProjectListView(APIView):
 
 
 class AppsListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Application.objects.all()
@@ -95,7 +96,7 @@ class AppsListView(APIView):
         return Response(serialize.data, HTTP_200_OK)
 
     #adiciona apps mesmo tendo no meio apps que ja existam
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -121,6 +122,7 @@ class AppsListView(APIView):
             
 
 class AppsDetailView(APIView):
+    @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         try:
@@ -131,6 +133,7 @@ class AppsDetailView(APIView):
         return Response(serialize.data, HTTP_200_OK)
 
 class AppsTestsView(APIView):
+    @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Test.objects.filter(test_application=appid)
@@ -143,6 +146,7 @@ class AppsTestsView(APIView):
 
 
 class AppsTestResultsView(APIView):
+    @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         tests = Test.objects.filter(test_application=appid)
@@ -162,6 +166,7 @@ class AppsTestResultsView(APIView):
 
 
 class AppsClassListView(APIView):
+    @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Class.objects.filter(class_app=appid)
@@ -182,7 +187,7 @@ class AppsClassListView(APIView):
         serialize = ClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request,appid):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -203,6 +208,7 @@ class AppsClassListView(APIView):
 
 
 class ResultsTestListView(APIView):
+    @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         try:
@@ -212,12 +218,13 @@ class ResultsTestListView(APIView):
         serializer = TestResultsFullSerializer(res, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
 
 
 class AppsMethodsListView(APIView):
+    @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Method.objects.all()
@@ -231,6 +238,7 @@ class AppsMethodsListView(APIView):
         return Response(serialize.data, HTTP_200_OK)
 
 class AppsMethodsDetailView(APIView):
+    @method_decorator(login_required)
     def get(self, request,appid,methodid):
         query=parse_qs(request.META['QUERY_STRING'])
         classes = Class.objects.filter(class_app=appid)
@@ -244,6 +252,7 @@ class AppsMethodsDetailView(APIView):
 
 
 class MethodsListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Method.objects.all()
@@ -283,7 +292,7 @@ class MethodsListView(APIView):
             serialize = MethodWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
     
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -307,6 +316,7 @@ class MethodsListView(APIView):
 
 
 class MethodMetricsView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Method.objects.all()
@@ -320,7 +330,7 @@ class MethodMetricsView(APIView):
         serialize = MethodWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -343,6 +353,7 @@ class MethodMetricsView(APIView):
 
 
 class AppsMetricsView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Application.objects.all()
@@ -377,7 +388,7 @@ class AppsMetricsView(APIView):
         serialize = AppWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -398,6 +409,7 @@ class AppsMetricsView(APIView):
 
 
 class ClassMetricsView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Class.objects.all()
@@ -432,7 +444,7 @@ class ClassMetricsView(APIView):
         serialize = ClassWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -454,6 +466,7 @@ class ClassMetricsView(APIView):
 
 
 class MethodInvokedListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = MethodInvoked.objects.all()
@@ -466,7 +479,7 @@ class MethodInvokedListView(APIView):
         serialize = MethodInvokedSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
@@ -490,6 +503,7 @@ class MethodInvokedListView(APIView):
 
 # /classes/
 class ClassesListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Class.objects.all()
@@ -510,7 +524,7 @@ class ClassesListView(APIView):
         serialize = ClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -539,7 +553,7 @@ class ClassesListView(APIView):
 
 
 class AppHasPermissionListView(APIView):
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -559,7 +573,7 @@ class AppHasPermissionListView(APIView):
                 return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_200_OK)
 
-
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = AppHasPermission.objects.all()
@@ -571,6 +585,7 @@ class AppHasPermissionListView(APIView):
         return Response(serialize.data, HTTP_200_OK)
 
 class ImportListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = ImportClass.objects.all()
@@ -581,7 +596,7 @@ class ImportListView(APIView):
         serialize = ImportClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = ImportClassSerializer(data=data, many=isinstance(data,list), partial=True)

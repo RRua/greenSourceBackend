@@ -17,9 +17,10 @@ from repoApp.models.models import TokenModel
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
+from django.contrib.admin.views.decorators import staff_member_required
 
 class TestsListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Test.objects.all()
@@ -38,7 +39,7 @@ class TestsListView(APIView):
         serialize = TestSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -77,6 +78,7 @@ class TestsListView(APIView):
         return Response('Internal error or malformed JSON ', HTTP_200_OK)
 
 class ResultsTestListView(APIView):
+    @method_decorator(login_required)
     def get(self, request,testid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = TestResults.objects.all()
@@ -93,7 +95,7 @@ class ResultsTestListView(APIView):
         serializer = TestResultsWithMetricsSerializer(results, many=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request,testid):
         data = JSONParser().parse(request) 
         if isinstance(data,list):
@@ -131,6 +133,7 @@ def getMetrics(initial_data):
         return
 
 class ResultsListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = TestResults.objects.all()
@@ -147,7 +150,7 @@ class ResultsListView(APIView):
         serializer = TestResultsSerializer(results, many=True)
         return Response(serializer.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = MethodMetricSerializer(data=data,many=isinstance(data, list), partial=True)
@@ -170,6 +173,7 @@ class ResultsListView(APIView):
 
 # test/metrics/
 class TestMetricsListView(APIView):
+    @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = TestMetric.objects.all()
@@ -182,7 +186,7 @@ class TestMetricsListView(APIView):
         serialize = TestMetricSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         if isinstance(data,list):
@@ -210,7 +214,7 @@ class TestMetricsListView(APIView):
 
 
 class TestResultsListView(APIView):
-    @method_decorator(login_required)
+    @method_decorator(staff_member_required)
     def post(self, request):
         data = JSONParser().parse(request)
         #print(data)
