@@ -370,6 +370,13 @@ class PopulateView(APIView):
             print(e)
         try:
             a = Profiler()
+            a.profiler_name="anadroid"
+            a.profiler_type='s'
+            a.save()
+        except Exception as e:
+            print(e)
+        try:
+            a = Profiler()
             a.profiler_name="power Tutor"
             a.profiler_type='m'
             a.save()

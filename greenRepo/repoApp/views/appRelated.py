@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import  GenericAPIView
 from rest_framework.status import *
 from urllib.parse import parse_qs
 from repoApp.models.testRelated import *
@@ -9,6 +10,7 @@ from repoApp.models.appRelated import *
 from repoApp.models.metricsRelated import *
 from repoApp.views.views import *
 from django.db import IntegrityError
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from django.db.models import Q , Count
 from django.core.exceptions import ValidationError
 import datetime
@@ -33,6 +35,7 @@ class ProjectView(APIView):
 
 
 class ProjectListView(APIView):
+    serializer_class = AndroidProjectSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -46,14 +49,17 @@ class ProjectListView(APIView):
 
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request) 
+        data = request.data
         if isinstance(data,list):
             for item in data:
                 try:
                     instance = AndroidProjectSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
-                except Exception as e:
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
@@ -61,13 +67,21 @@ class ProjectListView(APIView):
             try:
                 if instance.is_valid(raise_exception=True):
                     instance.save()
-            except Exception as e:
-                pass
+            except DRFValidationError as ex:
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(ex).__name__, ex.args)
+                print(message)
+                return Response(data, HTTP_200_OK) 
+            except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
+                    return Response(message, HTTP_400_BAD_REQUEST)
             return Response(instance.data, HTTP_200_OK)
-        return Response(instance.data, HTTP_200_OK)
 
 
 class AppsListView(APIView):
+    serializer_class = ApplicationSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -90,22 +104,27 @@ class AppsListView(APIView):
             try:
                 proj = AndroidProject.objects.get(project_id=query['app_project'][0])
                 results=results.filter(app_project=proj)
-            except Exception as e:
-                return Response(status=HTTP_404_NOT_FOUND)
+            except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
+                    return Response(status=HTTP_404_NOT_FOUND)
         serialize = ApplicationSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-    #adiciona apps mesmo tendo no meio apps que ja existam
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request) 
+        data = request.data
         if isinstance(data,list):
             for item in data:
                 try:
                     instance = ApplicationSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
-                except Exception as e:
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
@@ -114,11 +133,14 @@ class AppsListView(APIView):
             try:
                 if instance.is_valid(raise_exception=True):
                     instance.save()
-            except Exception as e:
-                print(e)
-                pass
+            except DRFValidationError as ex:
+                return Response(data, HTTP_200_OK) 
+            except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
+                    return Response(message, HTTP_400_BAD_REQUEST)
             return Response(instance.data, HTTP_200_OK)
-        return Response(instance.data, HTTP_200_OK)
             
 
 class AppsDetailView(APIView):
@@ -132,6 +154,7 @@ class AppsDetailView(APIView):
         serialize = ApplicationSerializer(results, many=False)
         return Response(serialize.data, HTTP_200_OK)
 
+# /apps/<app_id>/tests/
 class AppsTestsView(APIView):
     @method_decorator(login_required)
     def get(self, request,appid):
@@ -144,59 +167,56 @@ class AppsTestsView(APIView):
         serialize = TestSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
-
+# /apps/<app_id>/tests/results/
 class AppsTestResultsView(APIView):
     @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         tests = Test.objects.filter(test_application=appid)
-        if 'test_tool' in query:
-            tests=tests.filter(test_tool=query['test_tool'][0].lower())
-        if 'test_orientation' in query:
-            tests=tests.filter(test_orientation=query['test_orientation'][0].lower())
         results = TestResults.objects.filter(test_results_test__in=tests.values('id'))
-        if 'test_device' in query:
-            results=results.filter(test_results_device=query['test_device'][0])
-        if 'test_profiler' in query:
-            results=results.filter(test_results_profiler=query['test_profiler'][0])
-        if 'test_seed' in query:
-            results=results.filter(test_results_seed=query['test_seed'][0])
+        if 'test_results_device_state' in query:
+            results=results.filter(test_results_device_state=query['test_results_device_state'][0].lower()) 
+        if 'test_results_description' in query:
+            results=results.filter(test_results_description__contains=query['test_results_description'][0].lower())
+        if 'test_results_profiler' in query:
+            results=results.filter(test_results_profiler=query['test_results_profiler'][0])
+        if 'test_results_seed' in query:
+            results=results.filter(test_results_seed=query['test_results_seed'][0])
         serialize = TestResultsWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
 
+# /apps/<app_id>/classes/
 class AppsClassListView(APIView):
+    serializer_class = ClassSerializer
     @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Class.objects.filter(class_app=appid)
-        if 'class_is_interface' in query:
-            results=results.filter(class_package=query['class_is_interface'][0])
         if 'class_id' in query:
             results=results.filter(class_id=query['class_id'][0])
         if 'class_package' in query:
             results=results.filter(class_package=query['class_package'][0])
+        if 'class_language' in query:
+            results=results.filter(class_language=query['class_language'][0])
         if 'class_name' in query:
             results=results.filter(class_name=query['class_name'][0])
-        if 'class_non_acc_mod' in query:
-            results=results.filter(class_non_acc_mod__contains=query['class_non_acc_mod'][0])
-        if 'class_implemented_ifaces' in query:
-            results=results.filter(class_non_acc_mod__contains=query['class_implemented_ifaces'][0])
-        if 'class_superclass' in query:
-            results=results.filter(class_superclass=query['class_superclass'][0])
         serialize = ClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
     @method_decorator(staff_member_required)
     def post(self, request,appid):
-        data = JSONParser().parse(request)
+        data = request.data
         if isinstance(data,list):
             for item in data:
                 try:
                     instance = ClassSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
-                except Exception as e:
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
@@ -223,16 +243,23 @@ class ResultsTestListView(APIView):
         return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
 
 
+# /apps/<app_id>/methods/
 class AppsMethodsListView(APIView):
     @method_decorator(login_required)
     def get(self, request,appid):
         query=parse_qs(request.META['QUERY_STRING'])
         results = Method.objects.all()
         classes = Class.objects.filter(class_app=appid)
-        if 'class_name' in query:
-            classes=classes.filter(class_name=query['class_name'][0])
+        if 'method_id' in query:
+             results=results.filter(method_id=query['method_id'][0])
+        if 'method_class' in query:
+            classes=classes.filter(method_class=query['method_class'][0])
         if 'method_name' in query:
             results=results.filter(method_name=query['method_name'][0])
+        if 'method_return' in query:
+            results=results.filter(method_return=query['method_return'][0])
+        if 'method_modifier' in query:
+            results=results.filter(method_modifiers__contains=query['method_modifier'][0])
         results = results.filter(method_class__in=classes.values('class_id'))
         serialize = MethodSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
@@ -252,6 +279,7 @@ class AppsMethodsDetailView(APIView):
 
 
 class MethodsListView(APIView):
+    serializer_class = MethodWithMetricsSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -316,6 +344,7 @@ class MethodsListView(APIView):
 
 
 class MethodMetricsView(APIView):
+    serializer_class = MethodMetricSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -339,8 +368,10 @@ class MethodMetricsView(APIView):
                     instance =  MethodMetricSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
-                except Exception as e:
-                    print(e)
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
@@ -351,8 +382,9 @@ class MethodMetricsView(APIView):
             return Response(instance.data, HTTP_200_OK)
 
 
-
+# /apps/metrics/
 class AppsMetricsView(APIView):
+    serializer_class = AppMetricSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -372,43 +404,48 @@ class AppsMetricsView(APIView):
                 results=results.filter(app_id__in=metrics.values('am_app'))
             except ObjectDoesNotExist:
                 pass 
-        if 'app_metric_value_gte' in query:
-            try:
-                metrics=metrics.filter(am_class__in=results.values('app_id'),cm_value__gte=query['app_metric_value_gte'][0])
-                results=results.filter(app_id__in=metrics.values('am_app'))
-            except ObjectDoesNotExist:
-                pass
-        serialize = MethodSerializer(results, many=True)
-        if 'class_metric_value_lte' in query:
-            try:
-                metrics=metrics.filter(am_class__in=results.values('app_id'),cm_value__lte=query['app__metric_value_lte'][0])
-                results=results.filter(app_id__in=metrics.values('am_app'))
-            except ObjectDoesNotExist:
-                pass  
+        #if 'app_metric_value_gte' in query:
+        #    try:
+        #        metrics=metrics.filter(am_class__in=results.values('app_id'),cm_value__gte=query['app_metric_value_gte'][0])
+        #        results=results.filter(app_id__in=metrics.values('am_app'))
+        #    except ObjectDoesNotExist:
+        #        pass
+        #serialize = MethodSerializer(results, many=True)
+        #if 'class_metric_value_lte' in query:
+        #    try:
+        #        metrics=metrics.filter(am_class__in=results.values('app_id'),cm_value__lte=query['app__metric_value_lte'][0])
+        #        results=results.filter(app_id__in=metrics.values('am_app'))
+        #    except ObjectDoesNotExist:
+        #        pass  
         serialize = AppWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
         if isinstance(data,list):
             for item in data:
                 try:
-                    instance = AppWithMetricsSerializer(data=item, many=False, partial=True)
+                    instance = AppMetricSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=False):
                         instance.save()
-                except Exception as e:
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
-            instance = AppWithMetricsSerializer(data=data, many=False, partial=True)
+            instance = AppMetricSerializer(data=data, many=False, partial=True)
             if instance.is_valid(raise_exception=False):
                 instance.save()
                 return Response(instance.data, HTTP_200_OK)
             return Response(instance.data, HTTP_200_OK)
 
 
+#
 class ClassMetricsView(APIView):
+    serializer_class = ClassWithMetricsSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -418,43 +455,47 @@ class ClassMetricsView(APIView):
             results=results.filter(class_name=query['class_name'][0])
         if 'class_metric' in query:
             try:
-                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_metric=query['class_metric'][0])
+                metrics = ClassMetric.objects.filter(cm_metric=query['class_metric'][0])
+                
+                #metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_metric=query['class_metric'][0])
                 results=results.filter(class_id__in=metrics.values('cm_class'))
             except ObjectDoesNotExist:
                 pass
-        if 'class_metric_value' in query:
-            try:
-                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value=query['class_metric_value'][0])
-                results=results.filter(class_id__in=metrics.values('cm_class'))
-            except ObjectDoesNotExist:
-                pass 
-        if 'class_metric_value_gte' in query:
-            try:
-                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value__gte=query['class_metric_value_gte'][0])
-                results=results.filter(class_id__in=metrics.values('cm_class'))
-            except ObjectDoesNotExist:
-                pass
-        serialize = MethodSerializer(results, many=True)
-        if 'class_metric_value_lte' in query:
-            try:
-                metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value__lte=query['class_metric_value_lte'][0])
-                results=results.filter(class_id__in=metrics.values('cm_class'))
-            except ObjectDoesNotExist:
-                pass  
+        #if 'class_metric_value' in query:
+        #    try:
+        #        metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value=query['class_metric_value'][0])
+        #        results=results.filter(class_id__in=metrics.values('cm_class'))
+        #   except ObjectDoesNotExist:
+        #        pass 
+        #if 'class_metric_value_gte' in query:
+        #    try:
+        #        metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value__gte=query['class_metric_value_gte'][0])
+        #        results=results.filter(class_id__in=metrics.values('cm_class'))
+        #    except ObjectDoesNotExist:
+        #        pass
+        #serialize = MethodSerializer(results, many=True)
+        #if 'class_metric_value_lte' in query:
+        #    try:
+        #        metrics=metrics.filter(cm_class__in=results.values('class_id'),cm_value__lte=query['class_metric_value_lte'][0])
+        #        results=results.filter(class_id__in=metrics.values('cm_class'))
+        #    except ObjectDoesNotExist:
+        #        pass  
         serialize = ClassWithMetricsSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
         if isinstance(data,list):
             for item in data:
                 try:
                     instance = ClassMetricSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
-                except Exception as e:
-                    print(e)
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
@@ -466,6 +507,7 @@ class ClassMetricsView(APIView):
 
 
 class MethodInvokedListView(APIView):
+    serializer_class = MethodInvokedSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -481,7 +523,7 @@ class MethodInvokedListView(APIView):
 
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
         serializer = MethodInvokedSerializer(data=data, many=isinstance(data,list), partial=True)
         try:
             if serializer.is_valid(raise_exception=True):
@@ -492,41 +534,41 @@ class MethodInvokedListView(APIView):
                             if instance.is_valid(raise_exception=True):
                                 instance.save()
                             #serializer = TestSerializer(instance, many=isinstance(data,list))
-                        except Exception as e:
-                            print(e)
+                        except Exception as ex:
+                            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                            message = template.format(type(ex).__name__, ex.args)
+                            print(message)
                 return Response(serializer.data, HTTP_200_OK)
             else:
                 return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            print(e)
-            return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(ex).__name__, ex.args)
+                print(message)
+                return Response('Internal error or malformed JSON ', HTTP_400_BAD_REQUEST)
 
 # /classes/
 class ClassesListView(APIView):
+    serializer_class = ClassSerializer
     @method_decorator(login_required)
     def get(self, request):
+        print("testing ")
         query=parse_qs(request.META['QUERY_STRING'])
         results = Class.objects.all()
-        if 'class_is_interface' in query:
-            results=results.filter(class_package=query['class_is_interface'][0])
         if 'class_id' in query:
             results=results.filter(class_id=query['class_id'][0])
         if 'class_package' in query:
             results=results.filter(class_package=query['class_package'][0])
+        if 'class_language' in query:
+            results=results.filter(class_language=query['class_language'][0])
         if 'class_name' in query:
             results=results.filter(class_name=query['class_name'][0])
-        if 'class_non_acc_mod' in query:
-            results=results.filter(class_non_acc_mod__contains=query['class_non_acc_mod'][0])
-        if 'class_implemented_ifaces' in query:
-            results=results.filter(class_non_acc_mod__contains=query['class_implemented_ifaces'][0])
-        if 'class_superclass' in query:
-            results=results.filter(class_superclass=query['class_superclass'][0])
         serialize = ClassSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
         if isinstance(data,list):
             for item in data:
                 try:
@@ -544,8 +586,10 @@ class ClassesListView(APIView):
             try:
                 if instance.is_valid(raise_exception=True):
                     instance.save()
-            except Exception as e:
-                pass
+            except Exception as ex:
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(ex).__name__, ex.args)
+                print(message)
             return Response(instance.data, HTTP_200_OK)
         return Response(instance.data, HTTP_200_OK)
 
@@ -553,17 +597,20 @@ class ClassesListView(APIView):
 
 
 class AppHasPermissionListView(APIView):
+    serializer_class=AppHasPermissionSerializer
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
         if isinstance(data,list):
             for item in data:
                 try:
                     instance = AppHasPermissionSerializer(data=item, many=False, partial=True)
                     if instance.is_valid(raise_exception=True):
                         instance.save()
-                except Exception as e:
-                    print(e)
+                except Exception as ex:
+                    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print(message)
                     continue
             return Response(data, HTTP_200_OK)
         else:
@@ -577,14 +624,15 @@ class AppHasPermissionListView(APIView):
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
         results = AppHasPermission.objects.all()
-        if 'app_id' in query:
-            results=results.filter(application=query['app_id'][0])
+        if 'application' in query:
+            results=results.filter(application=query['application'][0])
         if 'permission' in query:
             results=results.filter(permission=query['permission'][0].lower())
         serialize = AppHasPermissionSerializer(results, many=True)
         return Response(serialize.data, HTTP_200_OK)
 
 class ImportListView(APIView):
+    serializer_class = ImportClassSerializer
     @method_decorator(login_required)
     def get(self, request):
         query=parse_qs(request.META['QUERY_STRING'])
@@ -598,7 +646,7 @@ class ImportListView(APIView):
 
     @method_decorator(staff_member_required)
     def post(self, request):
-        data = JSONParser().parse(request)
+        data = request.data
         serializer = ImportClassSerializer(data=data, many=isinstance(data,list), partial=True)
         if serializer.is_valid(raise_exception=True):
             if isinstance(data,list):

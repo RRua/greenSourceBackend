@@ -17,7 +17,7 @@ def default_create_token(token_model, user, serializer):
 
 
 def jwt_encode(user):
-    try:
+    try: 
         from rest_framework_jwt.settings import api_settings
     except ImportError:
         raise ImportError("djangorestframework_jwt needs to be installed")
@@ -27,3 +27,5 @@ def jwt_encode(user):
 
     payload = jwt_payload_handler(user)
     return jwt_encode_handler(payload)
+
+
