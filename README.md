@@ -10,7 +10,7 @@ $ python manage.py createsuperuser # creates a superuser in order to insert data
 $ python manage.py runserver
 $
 ```
-\* if you intend to insert information in the replicated repository using [AnaDroid](https://github.com/RRua/AnaDroid(http://greenlab.di.uminho.pt/greensource/), you must put user's information in a JSON file named GSLogin.json in $ANADROID_PATH/resources/config/ folder.
+\* if you intend to insert information in the replicated repository using [AnaDroid](https://github.com/RRua/AnaDroid), you must put user's information in a JSON file named GSLogin.json in $ANADROID_PATH/resources/config/ folder.
 
 ### Database schema
 ![db](https://raw.githubusercontent.com/RRua/greenSourceBackend/master/greenRepo/db_schema.png)
