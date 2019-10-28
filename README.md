@@ -1,15 +1,25 @@
 
 ## Installation (via command-line)
+
+### Debian GNU/Linux
+
 ```
 $ git clone https://github.com/RRua/greenSourceBackend.git
-$ cd greenrepo
-$ pip install -r requirements.txt # installs required packages ( you may want to use an isolated python environment to do this)
+$ cd greenSource/greenRepo
+$ pip3 install -r requirements.txt # installs required packages ( you may want to use an isolated python environment to do this. requires python version >3)
+$ sudo apt-get install libmysqlclient-dev
+$ sudo apt update
+$ sudo apt install mysql-server
+$ mysql_secure_installation
+$ mysql --user="username" -p < "init.sql"
 $ python manage.py makemigrations
 $ python manage.py migrate
 $ python manage.py createsuperuser # creates a superuser in order to insert data in the repository *
 $ python manage.py runserver
-$
+
 ```
+
+
 \* if you intend to insert information in the replicated repository using [AnaDroid](https://github.com/RRua/AnaDroid), you must put user's information in a JSON file named GSLogin.json in $ANADROID_PATH/resources/config/ folder.
 
 ### Database schema
