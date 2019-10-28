@@ -1,15 +1,19 @@
-# greenSourceBackend
+
+## Installation (via command-line)
+```
+$ git clone https://github.com/RRua/greenSourceBackend.git
+$ cd greenrepo
+$ pip install -r requirements.txt # installs required packages ( you may want to use an isolated python environment to do this)
+$ python manage.py makemigrations
+$ python manage.py migrate
+$ python manage.py createsuperuser # creates a superuser in order to insert data in the repository *
+$ python manage.py runserver
+$
+```
+\* if you intend to insert information in the replicated repository using [AnaDroid](https://github.com/RRua/AnaDroid(http://greenlab.di.uminho.pt/greensource/), you must put user's information in a JSON file named GSLogin.json in $ANADROID_PATH/resources/config/ folder.
+
+### Database schema
 ![db](https://raw.githubusercontent.com/RRua/greenSourceBackend/master/greenRepo/db_schema.png)
-
-# GreenSource
-####python manage.py makemigrations
-####python manage.py migrate
-####python manage.py runserver
-
-
-## NOTES
-### Metrics coeficient refers the factor relative to the IS (International System) units ( 1 second -> coeficient 1, 13 ms -> coeficient = 0.001)
-
 
 ```
 ## API
@@ -66,14 +70,14 @@
 - Device
   - [GET /devices/](#devices)
   - [POST /devices/](#devices)
+  - [GET /devicestate/](#devices)
+  - [POST /devicestate/](#devices)
 
 - Result
   - [GET /results/](#results)
   - [POST /results/](#results)
 
 ---
-
-
 
 
 ```
@@ -259,12 +263,13 @@ Povoa a BD com dados dummy para fins de testing.
         "app_build_type": "",
         "app_project": "xxxx-dummy-xxxx-project-test",
         "app_metrics": [
-            {
+            	{
                 "am_app": "dummy_app",
                 "am_metric": "nr_classes",
                 "am_value": 1,
                 "am_coeficient": 1,
                 "am_test_result" : 1
+		}
         ]
     }
 ]
@@ -287,7 +292,7 @@ Povoa a BD com dados dummy para fins de testing.
 #### Response (CODE HTTP200)
 ```json
 [
-  { {
+  {
         "app_id": "dummy_app",
         "app_location": "http://greensource.di.uminho.pt/dummy_app.zip",
         "app_description": "dumb",
