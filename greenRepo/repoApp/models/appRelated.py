@@ -19,7 +19,7 @@ class AppPermission(models.Model):
 class AndroidProject(models.Model):
     project_id = models.CharField(max_length=64, primary_key=True)
     project_build_tool=  models.CharField(max_length=16, default="gradle",blank=True)
-    project_desc = models.CharField(max_length=64,default=None,blank=True, null=True)
+    project_desc = models.CharField(max_length=512,default=None,blank=True, null=True)
     project_location= models.CharField(max_length=512, default=None, blank=True, null=True)
 
 

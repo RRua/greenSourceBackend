@@ -91,7 +91,7 @@ class DeviceSerializer(serializers.ModelSerializer):
 class DeviceStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeviceState
-        fields = ('state_id','state_os_version','state_date','state_miui_version', 'state_kernel_version','state_api_version','state_device_id','state_operator','state_operator_country')
+        fields = ('state_id','state_os_version','state_date','state_miui_version', 'state_kernel_version','state_api_version','state_device_id','state_operator','state_operator_country', 'state_nr_installed_apps')
         validators = []
 
 #class DeviceStateSerializer(serializers.ModelSerializer):

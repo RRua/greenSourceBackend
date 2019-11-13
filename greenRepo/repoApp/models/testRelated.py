@@ -62,6 +62,7 @@ class DeviceState(models.Model):
     #state_keyboard = models.CharField(max_length=128,default=None, null=True)
     state_operator = models.CharField(max_length=128,default=None, null=True)
     state_operator_country = models.CharField(max_length=16,default="PT", null=True)
+    state_nr_installed_apps  = models.IntegerField(default=1, null=True)
     state_device_id  = models.ForeignKey(Device, related_name='stateOf', on_delete=models.CASCADE)
 
 class Test(models.Model):
