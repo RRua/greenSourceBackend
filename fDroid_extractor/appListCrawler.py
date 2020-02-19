@@ -16,5 +16,7 @@ class AppListScrapper(scrapy.Spider):
         urls = response.xpath('//div[@id="full-package-list"]//a/@href').getall()
         jsdic={}
         jsdic[self.url]=urls[:30]
-        return jsdic
+        newl = map( lambda l : l.encode('utf-8'),urls[:30])
+        print( newl)
+        return newl
 
